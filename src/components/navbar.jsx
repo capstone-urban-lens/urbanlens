@@ -33,7 +33,7 @@ function navbar() {
             <AppBar position="static">
                 <Toolbar sx={{justifyContent: 'space-between', alignItems: 'center', px: {xs: 1, lg: 10, xl: 32}}}>
                     <Box sx={{display:{xs: 'flex', md: 'none'}, alignItems: 'center', gap: 1}}>
-                        <IconButton size='large' edge='start' color='inherit' onClick={openMenu}>
+                        <IconButton size='large' edge='start' color='inherit' onClick={openMenu} aria-label='Open navigation menu'>
                             <MenuIcon
                             />
                         </IconButton>

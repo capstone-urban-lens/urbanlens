@@ -83,6 +83,7 @@ function Sidebar({ sortOrder, setSortOrder }) {
                       sx={{ backgroundColor: '#fff' }}
                       onChange={(e) => setSortOrder(e.target.value)}
                       MenuProps={{ disableScrollLock: true }}
+                      inputProps={{ 'aria-label': 'Sort by price' }}
                     >
                       <MenuItem value="default">Default</MenuItem>
                       <MenuItem value="low-to-high">Lowest to Highest</MenuItem>
@@ -137,10 +138,11 @@ function Sidebar({ sortOrder, setSortOrder }) {
 
         <FormControl variant="outlined" sx={{ width: '200px', my: 1 }}>
                     
-                    <InputLabel>Place</InputLabel>
+                    <InputLabel id="place-select-label">Place</InputLabel>
                     <Select
                       value={option}
                       label="Place"
+                      labelId="place-select-label"
                       onChange={handleChange}
                       sx={{ backgroundColor: '#fff' }}
                       MenuProps={{ disableScrollLock: true }}
