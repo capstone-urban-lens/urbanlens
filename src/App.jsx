@@ -13,10 +13,6 @@ import CitiesInfo from "./components/citiesInfo.js";
 import SingleCityPage from "./pages/explore/singleCityPage.jsx";
 import UserAccount from "./pages/account/userAccount.jsx";
 import Compare from "./pages/compare/compareCities.jsx";
-
-//create single city page and add it as a route 
-//just go down to details 
-
 function App() {
 
   return (

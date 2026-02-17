@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 accountInfo.txt
+
+# Supabase Connection
+.env

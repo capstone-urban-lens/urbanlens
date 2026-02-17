@@ -5,9 +5,22 @@ import { useTheme } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import supabase from "../../services/supabase";
 
 function login () {
+
+    useEffect(() => {
+        async function testConnection() {
+            const { data, error } = await supabase.from('cities').select('*')
+            if (error) {
+            console.error('Supabase connection failed:', error.message)
+            } else {
+            console.log('Supabase connected! Data:', data)
+            }
+        }
+        testConnection()
+        }, [])
 
     const theme = useTheme();
     const [showPw, setShowPw] = useState(false);
