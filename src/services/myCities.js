@@ -1,11 +1,23 @@
-import citiesInfo from '../components/citiesInfo';
+import supabase from './supabase';
 
-export function getCities() {
-  // TODO: Replace with Supabase fetch
-  return citiesInfo;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
+export function getCityImageUrl(slug, num) {
+  return `${supabaseUrl}/storage/v1/object/public/city-images/${slug}-${num}.jpg`;
 }
 
-export function getCityBySlug(slug) {
-  // TODO: Replace with Supabase fetch
-  return citiesInfo.find((city) => city.slug === slug);
+export async function getCities() {
+  const { data, error } = await supabase.from('cities').select('*');
+  if (error) throw error;
+  return data;
+}
+
+export async function getCityBySlug(slug) {
+  const { data, error } = await supabase
+    .from('cities')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+  if (error) throw error;
+  return data;
 }

@@ -9,7 +9,6 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import Signup from "./pages/login/signup";
 import RandomRedirect from "./components/randomCommunityBoard";
-import CitiesInfo from "./components/citiesInfo.js";
 import SingleCityPage from "./pages/explore/singleCityPage.jsx";
 import UserAccount from "./pages/account/userAccount.jsx";
 import Compare from "./pages/compare/compareCities.jsx";
@@ -36,7 +35,7 @@ function App() {
 
             <Route
             exact path="/communityboard"
-            element={<RandomRedirect CitiesInfo={CitiesInfo} />} />
+            element={<RandomRedirect />} />
 
             <Route 
             exact path="/communityboard/:citySlug"

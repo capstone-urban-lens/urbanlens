@@ -1,24 +1,37 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Grid, Snackbar, Alert, Typography } from '@mui/material';
+import { Box, Grid, Snackbar, Alert } from '@mui/material';
 import Cards from "../../components/cityCard";
-import citiesInfo from "../../components/citiesInfo";
 import Sidebar from "../../components/sidebar";
+import { getCities, getCityImageUrl } from "../../services/myCities";
 
 //standarize card heights
 
 const parsePrice = (priceStr) => {
-  return parseInt(priceStr.replace(/[$,]/g, ''), 10);
+  return parseInt(String(priceStr).replace(/[$,]/g, ''), 10);
 };
 
 function explore() {
   const [sortOrder, setSortOrder] = useState('default');
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get('search') || '';
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    async function fetchCities() {
+      try {
+        const data = await getCities();
+        setCities(data);
+      } catch (err) {
+        console.error('Failed to fetch cities:', err.message);
+      }
+    }
+    fetchCities();
+  }, []);
 
   // Filter cities based on search (and later: population, climate)
   const getFilteredCities = () => {
-    let result = citiesInfo;
+    let result = cities;
 
     if (searchTerm) {
       result = result.filter(city =>
@@ -65,7 +78,7 @@ function explore() {
             return prev.filter(s => s !== slug);
         }
         const updated = [...prev, slug];
-        const city = citiesInfo.find(c => c.slug === slug);
+        const city = cities.find(c => c.slug === slug);
         if (updated.length < 2) {
             setAlertMsg(null);
             setTimeout(() => setAlertMsg(`${city?.title || slug} selected - pick another city to compare`))
@@ -105,7 +118,7 @@ function explore() {
                     <Grid size={{ xs: 12, md: 6 }} key={city.id}>
                       <Cards
                         title={city.title}
-                        image={city.img}
+                        image={getCityImageUrl(city.slug, 1)}
                         subtitle={city.subtitle}
                         slug={city.slug}
                         onCompare={handleCompare}

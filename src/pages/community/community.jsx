@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
-import { getCities, getCityBySlug } from "../../services/myCities";
+import { useState, useEffect } from "react";
+import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCities";
 import { Box, Typography, Button, useTheme } from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -18,6 +18,30 @@ function community() {
 
   const [comments, setComments] = useState(MockComments);
   const [newComment, setNewComment] = useState("");
+  const { citySlug } = useParams();
+  const navigate = useNavigate();
+  const theme = useTheme();
+
+  const [cities, setCities] = useState([]);
+  const [city, setCity] = useState(null);
+  const [option, setOption] = useState(citySlug);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [citiesData, cityData] = await Promise.all([
+          getCities(),
+          getCityBySlug(citySlug),
+        ]);
+        setCities(citiesData);
+        setCity(cityData);
+      } catch (err) {
+        console.error('Failed to fetch city data:', err.message);
+      }
+    }
+    fetchData();
+    setOption(citySlug);
+  }, [citySlug]);
 
   const handlePostComment = (e) => {
     e.preventDefault();
@@ -36,17 +60,9 @@ function community() {
     setNewComment("");
   }
 
-  const theme = useTheme();
-
-  const { citySlug } = useParams();
-  const navigate = useNavigate();
-  const cities = getCities();
-  const city = getCityBySlug(citySlug);
   if (!city) {
-  return <h2>City not found</h2>;
+    return <h2>Loading...</h2>;
   }
-
-  const [option, setOption] = useState(citySlug);
 
   const handleChange = (e) => {
     const newSlug = e.target.value;
@@ -105,7 +121,7 @@ function community() {
         >
           <Box
             component="img"
-            src={city.img}
+            src={getCityImageUrl(city.slug, 1)}
             alt={city.title}
             sx={{
               width: '100%',

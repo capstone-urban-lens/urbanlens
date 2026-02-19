@@ -11,7 +11,7 @@ import { getCities } from "../services/myCities";
 import InputLabel from '@mui/material/InputLabel';
 import Select  from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import Slider from '@mui/material/Slider';
 
@@ -28,8 +28,20 @@ function myValue(value) {
 
 function Sidebar({ sortOrder, setSortOrder }) {
   const theme = useTheme();
-  const cities = getCities();
+  const [cities, setCities] = useState([]);
   const { citySlug } = useParams();
+
+  useEffect(() => {
+    async function fetchCities() {
+      try {
+        const data = await getCities();
+        setCities(data);
+      } catch (err) {
+        console.error('Failed to fetch cities:', err.message);
+      }
+    }
+    fetchCities();
+  }, []);
   const navigate = useNavigate();
   const [option, setOption] = useState(citySlug || '');
   const [drawerOpen, setDrawerOpen] = useState(false);

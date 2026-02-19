@@ -1,11 +1,11 @@
-import { Typography, Box, IconButton } from "@mui/material";
+import { Typography, IconButton } from "@mui/material";
 import "./carousel.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Pagination, Navigation } from "swiper/modules";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import content from "./citiesInfo.js";
+import { getCities, getCityImageUrl } from "../services/myCities";
 import { useTheme } from "@mui/material/styles";
 import { useState, useEffect, useRef } from "react";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -14,6 +14,8 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 //clicking on the image will take it to the single city page for that city
 //do I need to move the title?
 //create peek of other items in the slideshow to the left and the right
+
+//move buttons outside of image
 
 function carousel() {
   const theme = useTheme();
@@ -50,8 +52,15 @@ function carousel() {
   const [slides, setSlides] = useState([]);
 
   useEffect(() => {
-    const randomSlides = getRandomSlides(content, 4); // pick 3 random slides
-    setSlides(randomSlides);
+    async function fetchSlides() {
+      try {
+        const data = await getCities();
+        setSlides(getRandomSlides(data, 4));
+      } catch (err) {
+        console.error('Failed to fetch cities for carousel:', err.message);
+      }
+    }
+    fetchSlides();
   }, []);
 
   return (
@@ -141,7 +150,7 @@ function carousel() {
           >
             {slides.map((slide, index) => (
               <SwiperSlide key={index}>
-                <img src={slide.img} alt={slide.title} />
+                <img src={getCityImageUrl(slide.slug, 1)} alt={slide.title} />
                 <div className="title">
                   <Typography variant="h2" color="primary">
                     {slide.title}
@@ -149,8 +158,8 @@ function carousel() {
                 </div>
                 <div className="content">
                   <div className="text-box">
-                    <Typography variant="body3" color="text">
-                      {slide.carousel}
+                    <Typography variant="body2" color="text">
+                      {slide.subtitle}
                     </Typography>
                   </div>
                   <div className="footer">

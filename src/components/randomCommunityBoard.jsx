@@ -1,15 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCities } from "../services/myCities";
 
-function randomRedirect ({ CitiesInfo }) {
+function randomRedirect () {
     const navigate = useNavigate();
+    const hasNavigated = useRef(false);
 
     useEffect(() => {
-        if (!CitiesInfo || CitiesInfo.length === 0) return;
-        // pick a random city slug
-        const randomCity = CitiesInfo[Math.floor(Math.random() * CitiesInfo.length)];
-        navigate(`/communityboard/${randomCity.slug}`);
-    }, [CitiesInfo, navigate]);
+        if (hasNavigated.current) return;
+        hasNavigated.current = true;
+        async function redirectToRandomCity() {
+            try {
+                const cities = await getCities();
+                if (!cities || cities.length === 0) return;
+                const randomCity = cities[Math.floor(Math.random() * cities.length)];
+                navigate(`/communityboard/${randomCity.slug}`);
+            } catch (err) {
+                console.error('Failed to fetch cities for redirect:', err.message);
+            }
+        }
+        redirectToRandomCity();
+    }, [navigate]);
 
     return null;
 } export default randomRedirect;

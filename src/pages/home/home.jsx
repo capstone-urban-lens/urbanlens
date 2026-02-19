@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import CityCarousel from "../../components/carousel.jsx";
 import web from "../../assets/img/peopleWeb.png";
 import CityCard from "../../components/cityCard.jsx";
-import Cities from "../../components/citiesInfo.js";
+import { getCityBySlug, getCityImageUrl } from "../../services/myCities";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
@@ -16,7 +16,22 @@ function home() {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
 
-  const myCities = Cities.slice(5, 7);
+  const [myCities, setMyCities] = useState([]);
+
+  useEffect(() => {
+    async function fetchFeaturedCities() {
+      try {
+        const results = await Promise.allSettled([
+          getCityBySlug('new-york-city-new-york'),
+          getCityBySlug('san-francisco-california'),
+        ]);
+        setMyCities(results.filter(r => r.status === 'fulfilled').map(r => r.value));
+      } catch (err) {
+        console.error('Failed to fetch featured cities:', err.message);
+      }
+    }
+    fetchFeaturedCities();
+  }, []);
 
   const [alertMsg, setAlertMsg] = useState(null);
   const [compareList, setCompareList] = useState([]);
@@ -37,7 +52,7 @@ function home() {
             return prev.filter(s => s !== slug);
         }
         const updated = [...prev, slug];
-        const city = Cities.find(c => c.slug === slug);
+        const city = myCities.find(c => c.slug === slug);
         if (updated.length < 2) {
             setAlertMsg(null);
             setTimeout(() => setAlertMsg(`${city?.title || slug} selected - pick another city to compare`))
@@ -163,7 +178,7 @@ function home() {
             Find Your Dream City
           </Typography>
           <Typography
-            variant="body1"
+            variant="body2"
             color="text"
             sx={{
               textAlign: { xs: "left", lg: "center" },
@@ -174,7 +189,7 @@ function home() {
             easier.
           </Typography>
           <Typography
-            variant="body1"
+            variant="body2"
             color="text"
             sx={{
               textAlign: { xs: "left", lg: "center" },
@@ -184,7 +199,7 @@ function home() {
             in your decision.
           </Typography>
           <Typography
-            variant="body1"
+            variant="body2"
             color="text"
             sx={{
               textAlign: { xs: "left", lg: "center" },
@@ -227,7 +242,7 @@ function home() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        p: 3,
+        p: 4,
         ml: '-10px',
       }}
       >
@@ -308,15 +323,16 @@ function home() {
               mt: {xs: 1, md: 0}
             }}
             >
-              <Typography variant="h2" color="text">
+              <Typography variant="h3" color="text">
                 Top 10 Safest Cities in 2026
               </Typography>
               <Box
               component="ul"
               sx={{
                 margin: 0,
-                padding: 0,
+                // padding: 0,
                 pl: '1.3em',
+                py: 2,
                 color: theme.palette.text.main
               }}
               >
@@ -335,7 +351,7 @@ function home() {
             sx={{
             }}
           >
-              <Typography variant="h2" color="text">
+              <Typography variant="h3" color="text">
                 Trustworthy Information
               </Typography>
               <Typography variant="body2" color="text">
@@ -425,7 +441,7 @@ function home() {
               <Grid size={{ xs: 12, md: 6 }} key={city.id}>
                 <CityCard
                   title={city.title}
-                  image={city.img}
+                  image={getCityImageUrl(city.slug, 1)}
                   subtitle={city.subtitle}
                   slug={city.slug}
                   onCompare={handleCompare}

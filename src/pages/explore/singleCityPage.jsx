@@ -1,7 +1,7 @@
-import { getCities, getCityBySlug } from "../../services/myCities";
+import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCities";
 import { Box, Button, Typography, IconButton, useTheme, Snackbar, Alert, Grid } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
@@ -13,16 +13,26 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 function SingleCityPage() {
     const { citySlug } = useParams();
-    // const cities = getCities();
-    const city = getCityBySlug(citySlug);
-    if (!city) {
-      return <Typography variant="h2">City not found</Typography>;
-    }
-
+    const [city, setCity] = useState(null);
     const [bookmarked, setBookmarked] = useState(false);
     const [liked, setLiked] = useState(false);
-    // const [compare, setCompared] = useState(false);
     const [alertMsg, setAlertMsg] = useState(null);
+
+    useEffect(() => {
+      async function fetchCity() {
+        try {
+          const data = await getCityBySlug(citySlug);
+          setCity(data);
+        } catch (err) {
+          console.error('Failed to fetch city:', err.message);
+        }
+      }
+      fetchCity();
+    }, [citySlug]);
+
+    if (!city) {
+      return <Typography variant="h2">Loading...</Typography>;
+    }
 
     const showAlert = (msg) => {
         setAlertMsg(null);
@@ -52,7 +62,7 @@ function SingleCityPage() {
                 <Box sx={{ width: {xs: '90vw', lg: '60vw'}, mt: 5 }}>
                     <Box
                     component="img"
-                    src={city.img}
+                    src={getCityImageUrl(city.slug, 1)}
                     alt={city.title}
                     sx={{
                         width: '100%',
@@ -143,7 +153,7 @@ function SingleCityPage() {
                                 my: 2,
                                 pr: 2,
                             }}
-                            >{city.subtitle}</Typography>
+                            >{city.information}</Typography>
                             <Button color="accent" variant="contained" component={Link}
                             to={`/communityboard/${citySlug}`}
                             sx={{
@@ -159,9 +169,9 @@ function SingleCityPage() {
                         <Grid item size={{ xs: 12, md: 6}}
                         sx={{}}
                         >
-                            <Box 
+                            <Box
                             component="img"
-                            src={city.img}
+                            src={getCityImageUrl(city.slug, 2)}
                             alt={city.title}
                             sx={{
                             width: '100%',
