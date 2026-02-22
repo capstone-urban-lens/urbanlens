@@ -36,8 +36,7 @@ function explore() {
 
     if (searchTerm) {
       result = result.filter(city =>
-        city.title.toLowerCase().startsWith(searchTerm.toLowerCase())
-      );
+        city.title.toLowerCase().startsWith(searchTerm.toLowerCase()) || city.state.toLowerCase().startsWith(searchTerm.toLowerCase()) || city.abbrev.toLowerCase() === searchTerm.toLowerCase());
     }
     // Future filters go here:
     // if (population !== 'all') { result = result.filter(...) }
