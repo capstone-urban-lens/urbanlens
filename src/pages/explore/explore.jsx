@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Box, Grid, Snackbar, Alert } from '@mui/material';
 import Cards from "../../components/cityCard";
 import Sidebar from "../../components/sidebar";
+import Pagination from '@mui/material/Pagination';
 import { getCities, getCityImageUrl } from "../../services/myCities";
 
 //standarize card heights
@@ -59,6 +60,20 @@ function explore() {
   const filteredCities = getFilteredCities();
   const sortedCities = getSortedCities(filteredCities);
 
+  const noItems = 20;
+  const [page, setPage] = useState(1);
+  const handleChange = (e, value) => {
+    setPage(value);
+  }
+  const totalPages = Math.ceil(sortedCities.length / noItems);
+  const startInd = (page - 1) * noItems;
+  const endInd = startInd + noItems;
+  const paginatedCities = sortedCities.slice(startInd, endInd);
+
+  useEffect(() => {
+    setPage(1)
+  }, [searchTerm, sortOrder])
+
   const [alertMsg, setAlertMsg] = useState(null);
   const [compareList, setCompareList] = useState([]);
   const navigate = useNavigate();
@@ -114,7 +129,7 @@ function explore() {
                     </Box>
                   </Grid>
                 ) : (
-                  sortedCities.map((city) => (
+                  paginatedCities.map((city) => (
                     <Grid size={{ xs: 12, md: 6 }} key={city.id}>
                       <Cards
                         title={city.title}
@@ -125,8 +140,22 @@ function explore() {
                         isComparing={compareList.includes(city.slug)}
                       />
                     </Grid>
+                    
                   ))
                 )}
+                {sortedCities.length > 0 && 
+                  <Grid size={12} sx={{ display: 'flex', justifyContent: 'center', mt: 2, '& .Mui-selected': {
+                  backgroundColor: '#97D071',
+                } }}>
+                    <Pagination
+                      count={totalPages}
+                      page={page}
+                      onChange={handleChange}
+                      // showFirstButton
+                      // showLastButton
+                    />
+                
+                </Grid>}
             </Grid>
           </Grid>
         </Grid>
