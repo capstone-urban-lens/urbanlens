@@ -165,7 +165,7 @@ function Sidebar({ sortOrder, setSortOrder }) {
                           fontFamily: " 'Pontano Sans', serif"
                         }}
                         >
-                          {c.title}
+                          {c.title}, {c.abbrev}
                         </MenuItem>
                       ))}
                     </Select>

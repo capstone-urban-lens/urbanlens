@@ -441,6 +441,7 @@ function home() {
               <Grid size={{ xs: 12, md: 6 }} key={city.id}>
                 <CityCard
                   title={city.title}
+                  abbrev={city.abbrev}
                   image={getCityImageUrl(city.slug, 1)}
                   subtitle={city.subtitle}
                   slug={city.slug}

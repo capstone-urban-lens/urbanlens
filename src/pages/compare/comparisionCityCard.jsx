@@ -24,7 +24,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 //and change the useState for a state that will persist for user logged in status and beyond refreshes
 
-function cityCard({ title, qol, image, population, climate, price, commute, cost_living, slug,  }) {
+function cityCard({ title, abbrev, qol, image, population, climate, price, commute, cost_living, slug,  }) {
 
     const [bookmarked, setBookmarked] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -80,7 +80,7 @@ function cityCard({ title, qol, image, population, climate, price, commute, cost
       >
         <CardContent sx={{ pb: 1 }}>
           <Typography variant="body3" fontWeight={600}>
-            {title}
+            {title}, {abbrev}
           </Typography>
           {[
             { label: "Overall Quality of Life Score", value: qol, highlight: true },

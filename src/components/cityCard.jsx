@@ -22,7 +22,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 //and change the useState for a state that will persist for user logged in status and beyond refreshes
 
-function cityCard({ title, subtitle, image, slug, onCompare, isComparing, defaultBookmarked = false, defaultLiked = false }) {
+function cityCard({ title, abbrev, subtitle, image, slug, onCompare, isComparing, defaultBookmarked = false, defaultLiked = false }) {
 
     const [bookmarked, setBookmarked] = useState(defaultBookmarked);
     const [liked, setLiked] = useState(defaultLiked);
@@ -84,7 +84,7 @@ function cityCard({ title, subtitle, image, slug, onCompare, isComparing, defaul
       >
         <CardContent sx={{ pb: 1 }}>
           <Typography variant="body3" fontWeight={600}>
-            {title}
+            {title}, {abbrev}
           </Typography>
 
           <Typography

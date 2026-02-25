@@ -1,42 +1,46 @@
-import Cities from "../../components/citiesInfo.js";
-import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Box, Typography, Button } from "@mui/material";
-import { useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
 import CompareCard from "./comparisionCityCard.jsx";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { getCities, getCityImageUrl } from "../../services/myCities";
 
 function compareCities() {
 
-    const theme = useTheme();
     const navigate = useNavigate();
     const { slug1, slug2 } = useParams();
 
-    const [option1, setOption1] = useState(slug1);
-    const [option2, setOption2] = useState(slug2);
+    const [cities, setCities] = useState([]);
+    const [error, setError] = useState(false);
 
-    const city1 = Cities.find(city => city.slug === option1);
-    const city2 = Cities.find(city => city.slug === option2);
+    useEffect(() => {
+        async function fetchCities() {
+            try {
+                const data = await getCities();
+                setCities(data);
+            } catch (err) {
+                console.error('Failed to fetch cities:', err.message);
+                setError(true);
+            }
+        }
+        fetchCities();
+    }, []);
+
+    const city1 = cities.find(city => city.slug === slug1);
+    const city2 = cities.find(city => city.slug === slug2);
+
+    const handleChange1 = (e) => navigate(`/compare/${e.target.value}/${slug2}`);
+    const handleChange2 = (e) => navigate(`/compare/${slug1}/${e.target.value}`);
+
+    if (error) return <Typography variant="h2">Failed to load cities</Typography>;
+    if (cities.length === 0) return null;
 
     if (!city1 || !city2) {
         return <Typography variant="h2">City not found</Typography>
     }
-
-    const handleChange1 = (e) => {
-        const newSlug = e.target.value;
-        setOption1(newSlug);
-        navigate(`/compare/${newSlug}/${option2}`);
-    };
-
-    const handleChange2 = (e) => {
-        const newSlug = e.target.value;
-        setOption2(newSlug);
-        navigate(`/compare/${option1}/${newSlug}`);
-    };
 
     return (
         <>
@@ -52,24 +56,25 @@ function compareCities() {
                     <FormControl variant="filled" sx={{ width: '200px', mb: 2 }}>
                         <InputLabel>City 1</InputLabel>
                         <Select
-                          value={option1}
+                          value={slug1}
                           label="City 1"
                           onChange={handleChange1}
                           sx={{ backgroundColor: 'rgba(120, 145, 116, 0.5)' }}
                         >
-                          {Cities.map((c) => (
+                          {cities.map((c) => (
                             <MenuItem key={c.slug} value={c.slug}
                             sx={{ fontFamily: "'Pontano Sans', serif" }}
                             >
-                              {c.title}
+                              {c.title}, {c.abbrev}
                             </MenuItem>
                           ))}
                         </Select>
                     </FormControl>
                     <CompareCard
                         title={city1.title}
+                        abbrev={city1.abbrev}
                         qol={city1.qol}
-                        image={city1.img}
+                        image={getCityImageUrl(city1.slug, 1)}
                         population={city1.population}
                         climate={city1.climate}
                         price={city1.price}
@@ -82,24 +87,25 @@ function compareCities() {
                     <FormControl variant="filled" sx={{ width: '200px', mb: 2 }}>
                         <InputLabel>City 2</InputLabel>
                         <Select
-                          value={option2}
+                          value={slug2}
                           label="City 2"
                           onChange={handleChange2}
                           sx={{ backgroundColor: 'rgba(120, 145, 116, 0.5)' }}
                         >
-                          {Cities.map((c) => (
+                          {cities.map((c) => (
                             <MenuItem key={c.slug} value={c.slug}
                             sx={{ fontFamily: "'Pontano Sans', serif" }}
                             >
-                              {c.title}
+                              {c.title}, {c.abbrev}
                             </MenuItem>
                           ))}
                         </Select>
                     </FormControl>
                     <CompareCard
                         title={city2.title}
+                        abbrev={city2.abbrev}
                         qol={city2.qol}
-                        image={city2.img}
+                        image={getCityImageUrl(city2.slug, 1)}
                         population={city2.population}
                         climate={city2.climate}
                         price={city2.price}
@@ -126,9 +132,9 @@ function compareCities() {
                         mb: {xs: 2, md: 0}
                         }}
                 >
-                    Discover More Cities 
+                    Discover More Cities
                 </Button>
-                
+
             </Box>
         </>
     )
