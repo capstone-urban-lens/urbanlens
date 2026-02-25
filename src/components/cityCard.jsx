@@ -43,6 +43,7 @@ function cityCard({ title, subtitle, image, slug, onCompare, isComparing, defaul
         sx={{
             width: "100%",
             maxWidth: 340,
+            height: '100%',
             mx: 'auto',
             borderRadius: 2,
             overflow: "hidden",
@@ -50,7 +51,8 @@ function cityCard({ title, subtitle, image, slug, onCompare, isComparing, defaul
             cursor: 'pointer',
             boxShadow: 4,
             textDecoration: 'none',
-            display: 'block',
+            display: 'flex',
+            flexDirection: 'column',
             transition: 'box-shadow 0.3s ease',
             '&:hover': {
                 boxShadow: '0 0 30px rgba(151, 208, 113, 0.6)'
@@ -73,8 +75,11 @@ function cityCard({ title, subtitle, image, slug, onCompare, isComparing, defaul
         sx={{
           backgroundColor: theme.palette.primary.main,
           color: "white",
-          //px: 2,   
+          //px: 2,
           py: 1,
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <CardContent sx={{ pb: 1 }}>
@@ -95,6 +100,7 @@ function cityCard({ title, subtitle, image, slug, onCompare, isComparing, defaul
             display: "flex",
             justifyContent: "flex-start",
             pt: 0,
+            mt: 'auto',
           }}
         >
           <IconButton onClick={(e) => { e.preventDefault(); setBookmarked(!bookmarked); showAlert(bookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'); }} sx={{ color: theme.palette.accent.main }}>
