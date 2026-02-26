@@ -37,7 +37,7 @@ function SearchBar() {
                 borderRadius: '999px',
                 px: { xs: 1, md: 2 },
                 py: { xs: 0.25, md: 0.5 },
-                width: { xs: 100, md: 300 },
+                width: { xs: 100, md: 200, lg: 250, xl: 300 },
                 mr: {xs: 1, }
             }}
         >

@@ -11,7 +11,7 @@ import { useAuth } from "../context/AuthContext";
 
 
 const pages=[
-    { label: 'Home', path: '/' },
+    { label: 'Compare Cities', path: '/compare' },
     { label: 'Explore Areas', path: '/explore' },
     { label: 'Community Board', path: '/communityboard' },
 ];
@@ -111,7 +111,7 @@ function Navbar() {
                             component={NavLink}
                             to={page.path}
                             sx={{ fontWeight: 'semi-bold',
-                                fontSize: {md: '0.9rem', lg: '1.1rem', xl: '1.5rem'},
+                                fontSize: {md: '1rem', lg: '1.1rem', xl: '1.5rem'},
                                 color: 'inherit',
                                 whiteSpace: 'nowrap',
                                 '&.active': {
@@ -135,7 +135,7 @@ function Navbar() {
                             endIcon={<KeyboardArrowDownIcon />}
                             sx={{
                                 fontWeight: 'semi-bold',
-                                fontSize: {md: '0.9rem', lg: '1.1rem', xl: '1.5rem'},
+                                fontSize: {md: '1rem', lg: '1.1rem', xl: '1.5rem'},
                                 color: 'inherit',
                                 whiteSpace: 'nowrap',
                                 '&:hover': {
@@ -177,7 +177,7 @@ function Navbar() {
                             endIcon={<KeyboardArrowDownIcon />}
                             sx={{
                                 fontWeight: 'semi-bold',
-                                fontSize: {md: '0.9rem', lg: '1.1rem', xl: '1.5rem'},
+                                fontSize: {md: '1rem', lg: '1.1rem', xl: '1.5rem'},
                                 color: 'inherit',
                                 whiteSpace: 'nowrap',
                                 '&:hover': {

@@ -12,6 +12,7 @@ import RandomRedirect from "./components/randomCommunityBoard";
 import SingleCityPage from "./pages/explore/singleCityPage.jsx";
 import UserAccount from "./pages/account/userAccount.jsx";
 import Compare from "./pages/compare/compareCities.jsx";
+import RandomCompareRedirect from "./components/randomCompareRedirect.jsx";
 function App() {
 
   return (
@@ -60,6 +61,10 @@ function App() {
             <Route
             exact path="/account"
             element={<UserAccount />} />
+
+            <Route
+            exact path="/compare"
+            element={<RandomCompareRedirect />} />
 
             <Route
             exact path="/compare/:slug1/:slug2"
