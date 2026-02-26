@@ -17,6 +17,7 @@ function login () {
     const [email, setEmail] = useState('');
     const [pw, setPw] = useState('');
     const [error, setError] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleClickShowPw = () => setShowPw((show) => !show);
     const handleMouseDownPw = (e) => {
@@ -27,12 +28,15 @@ function login () {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         setError(null);
         try {
             await logIn(email, pw);
             navigate('/account')
         } catch (err) {
             setError(err.message);
+            setIsSubmitting(false);
         }
     }
 
@@ -61,7 +65,7 @@ function login () {
                 boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
                 borderRadius: 3,
                 width: {xs: '90vw', md: '50vw'},
-                height: '60vh',
+                height: '70vh',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -120,6 +124,7 @@ function login () {
                     variant="contained"
                     size="large"
                     type="submit"
+                    disabled={isSubmitting}
                     sx={{
                         my: 2,
                         backgroundColor: theme.palette.primary.main,

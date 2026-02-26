@@ -41,9 +41,13 @@ function Signup () {
             return;
         }
         try {
-            await signUp(email, pw)
-            showAlert('Account created successfully!');
-            setTimeout(() => navigate('/account'), 800)
+            const data = await signUp(email, pw);
+            if (data.session) {
+                showAlert('Account created successfully!');
+                setTimeout(() => navigate('/account'), 800);
+            } else {
+                setError('Account creation failed. Please try again.'); //swap this line to check email if email confirmation is enabled later 
+            }
         } catch (err) {
             setError(err.message);
         }

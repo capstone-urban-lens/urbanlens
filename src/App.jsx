@@ -1,5 +1,5 @@
 import './App.css'
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import Home from "./pages/home/home";
 import Explore from "./pages/explore/explore";
@@ -13,7 +13,10 @@ import SingleCityPage from "./pages/explore/singleCityPage.jsx";
 import UserAccount from "./pages/account/userAccount.jsx";
 import Compare from "./pages/compare/compareCities.jsx";
 import RandomCompareRedirect from "./components/randomCompareRedirect.jsx";
+import { useAuth } from "./context/AuthContext";
+
 function App() {
+  const { user, loading } = useAuth();
 
   return (
     <>
@@ -42,16 +45,8 @@ function App() {
             exact path="/communityboard/:citySlug"
             element={<Community />} />
 
-            {/* <Route
-              path="/account"
-              element={
-                isLoggedIn ? <Account /> : <Navigate to="/login" />
-              }
-            /> */}
-            {/* can also display username and picture here */}
-
-            <Route 
-            exact path="/login" 
+            <Route
+            exact path="/login"
             element={<Login />} />
 
             <Route
@@ -60,7 +55,7 @@ function App() {
 
             <Route
             exact path="/account"
-            element={<UserAccount />} />
+            element={loading ? null : (user ? <UserAccount /> : <Navigate to="/login" />)} />
 
             <Route
             exact path="/compare"

@@ -19,10 +19,13 @@ const pages=[
 function Navbar() {
     const [anchorNav, setAnchorNav] = useState(null);
     const [anchorAuth, setAnchorAuth] = useState(null);
+    const [signingOut, setSigningOut] = useState(false);
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
     const handleSignOut = async () => {
+        if (signingOut) return;
+        setSigningOut(true);
         closeAuthMenu();
         closeMenu();
         await signOut().catch(() => {});
@@ -69,10 +72,17 @@ function Navbar() {
                                     >{page.label}
                                     </MenuItem>
                                 ))}
-                                {user && <MenuItem component={Link} to={'/account'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>My Account</MenuItem>}
-                                {user && <MenuItem onClick={handleSignOut} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign Out</MenuItem>}
-                                {!user && <MenuItem component={Link} to={'/login'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Log in</MenuItem>}
-                                {!user && <MenuItem component={Link} to={'/signup'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign up</MenuItem>}
+                                {!loading && (user ? (
+                                    <>
+                                        <MenuItem component={Link} to={'/account'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>My Account</MenuItem>
+                                        <MenuItem onClick={handleSignOut} disabled={signingOut} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign Out</MenuItem>
+                                    </>
+                                ) : (
+                                    <>
+                                        <MenuItem component={Link} to={'/login'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Log in</MenuItem>
+                                        <MenuItem component={Link} to={'/signup'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign up</MenuItem>
+                                    </>
+                                ))}
                             </MenuList>
                         </Menu>
                         <SearchBar />
@@ -128,7 +138,7 @@ function Navbar() {
                                 {page.label}
                             </Button>
                         ))}
-                       {user ? (
+                       {!loading && (user ? (
                         <>
                          <Button
                             onClick={openAuthMenu}
@@ -164,6 +174,7 @@ function Navbar() {
                             </MenuItem>
                             <MenuItem
                                 onClick={handleSignOut}
+                                disabled={signingOut}
                                 sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
                             >
                                 Sign Out
@@ -214,7 +225,7 @@ function Navbar() {
                             </MenuItem>
                         </Menu>
                         </>
-                       )}
+                       ))}
                         <Box sx={{
                             ml:{ xs: 1, lg: 4, xl: 12 }
                         }}>
