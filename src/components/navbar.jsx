@@ -101,8 +101,9 @@ function Navbar() {
 
                     <Box sx={{
                         display:{xs: 'none', md: 'flex'},
-                        gap: 4,
-                        alignItems: 'center'
+                        gap: {md: 1, lg: 4},
+                        alignItems: 'center',
+                        flexWrap: 'nowrap',
                         }}>
                         {pages.map((page)=>(
                             <Button
@@ -110,8 +111,9 @@ function Navbar() {
                             component={NavLink}
                             to={page.path}
                             sx={{ fontWeight: 'semi-bold',
-                                fontSize: {lg: '1.1rem', xl: '1.5rem'},
+                                fontSize: {md: '0.9rem', lg: '1.1rem', xl: '1.5rem'},
                                 color: 'inherit',
+                                whiteSpace: 'nowrap',
                                 '&.active': {
                                     color: 'accent.main',
                                 },
@@ -133,8 +135,9 @@ function Navbar() {
                             endIcon={<KeyboardArrowDownIcon />}
                             sx={{
                                 fontWeight: 'semi-bold',
-                                fontSize: {lg: '1.1rem', xl: '1.5rem'},
+                                fontSize: {md: '0.9rem', lg: '1.1rem', xl: '1.5rem'},
                                 color: 'inherit',
+                                whiteSpace: 'nowrap',
                                 '&:hover': {
                                     color: 'accent.main',
                                     backgroundColor: 'transparent',
@@ -174,8 +177,9 @@ function Navbar() {
                             endIcon={<KeyboardArrowDownIcon />}
                             sx={{
                                 fontWeight: 'semi-bold',
-                                fontSize: {lg: '1.1rem', xl: '1.5rem'},
+                                fontSize: {md: '0.9rem', lg: '1.1rem', xl: '1.5rem'},
                                 color: 'inherit',
+                                whiteSpace: 'nowrap',
                                 '&:hover': {
                                     color: 'accent.main',
                                     backgroundColor: 'transparent',
