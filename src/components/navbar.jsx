@@ -1,33 +1,52 @@
 import { useState } from "react";
 import { AppBar, Toolbar, IconButton, Box, Button, Menu, MenuList, MenuItem } from "@mui/material";
-import { Link, NavLink } from 'react-router-dom';
-import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { signOut } from '../services/auth';
 import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import './navbar.css';
 import keyLogo from '../assets/img/logo.png';
 import SearchBar from './searchbar';
+import { useAuth } from "../context/AuthContext";
 
-//navbar will have to update to change from "log in" to "my account" upon successful login 
-
-//figure out how to display searchbar on mobile, if we want that
 
 const pages=[
     { label: 'Home', path: '/' },
     { label: 'Explore Areas', path: '/explore' },
     { label: 'Community Board', path: '/communityboard' },
-    { label: 'Log in', path: '/login' },
 ];
 
+const authItems = [
+    { label: 'Log In', path: '/login' },
+    { label: 'Sign Up', path: '/signup' },
+];
 
 function navbar() {
     const [anchorNav, setAnchorNav] = useState(null);
+    const [anchorAuth, setAnchorAuth] = useState(null);
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const handleSignOut = async () => {
+        closeAuthMenu();
+        closeMenu();
+        await signOut();
+        navigate('/login');
+    };
 
     const openMenu = (event)=>{
         setAnchorNav(event.currentTarget);
     };
     const closeMenu=()=>{
         setAnchorNav(null);
-    }
+    };
+
+    const openAuthMenu = (event) => {
+        setAnchorAuth(event.currentTarget);
+    };
+    const closeAuthMenu = () => {
+        setAnchorAuth(null);
+    };
     return (
         <>
             <AppBar position="static">
@@ -51,6 +70,24 @@ function navbar() {
                                     >{page.label}
                                     </MenuItem>
                                 ))}
+                                {authItems.map((item)=>(
+                                    <MenuItem
+                                    key={item.path}
+                                    component={Link}
+                                    to={item.path}
+                                    onClick={closeMenu}
+                                    sx={{
+                                        fontFamily: '"Pontano Sans", sans-serif',
+                                    }}
+                                    >{item.label}
+                                    </MenuItem>
+                                ))}
+                                <MenuItem
+                                    onClick={handleSignOut}
+                                    sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
+                                >
+                                    Sign Out
+                                </MenuItem>
                             </MenuList>
                         </Menu>
                         <SearchBar />
@@ -83,9 +120,9 @@ function navbar() {
                         alignItems: 'center'
                         }}>
                         {pages.map((page)=>(
-                            <Button 
-                            key={page.path} 
-                            component={NavLink} 
+                            <Button
+                            key={page.path}
+                            component={NavLink}
                             to={page.path}
                             sx={{ fontWeight: 'semi-bold',
                                 fontSize: {lg: '1.1rem', xl: '1.5rem'},
@@ -104,6 +141,91 @@ function navbar() {
                                 {page.label}
                             </Button>
                         ))}
+                       {user ? (
+                        <>
+                         <Button
+                            onClick={openAuthMenu}
+                            endIcon={<KeyboardArrowDownIcon />}
+                            sx={{
+                                fontWeight: 'semi-bold',
+                                fontSize: {lg: '1.1rem', xl: '1.5rem'},
+                                color: 'inherit',
+                                '&:hover': {
+                                    color: 'accent.main',
+                                    backgroundColor: 'transparent',
+                                    transform: 'scale(1.08)',
+                                    transition: 'transform 0.6s, color 0.8s',
+                                }
+                            }}
+                        >
+                            My Account
+                        </Button>
+                        <Menu
+                            anchorEl={anchorAuth}
+                            open={Boolean(anchorAuth)}
+                            onClose={closeAuthMenu}
+                            disableScrollLock
+                        >
+                            <MenuItem
+                                component={Link}
+                                to={'/account'}
+                                onClick={closeAuthMenu}
+                                sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
+                            >
+                                My Account
+                            </MenuItem>
+                            <MenuItem
+                                onClick={handleSignOut}
+                                sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
+                            >
+                                Sign Out
+                            </MenuItem>
+                        </Menu>
+                        </>
+                       ): (
+                        <>
+                         <Button
+                            onClick={openAuthMenu}
+                            endIcon={<KeyboardArrowDownIcon />}
+                            sx={{
+                                fontWeight: 'semi-bold',
+                                fontSize: {lg: '1.1rem', xl: '1.5rem'},
+                                color: 'inherit',
+                                '&:hover': {
+                                    color: 'accent.main',
+                                    backgroundColor: 'transparent',
+                                    transform: 'scale(1.08)',
+                                    transition: 'transform 0.6s, color 0.8s',
+                                }
+                            }}
+                        >
+                            Log In
+                        </Button>
+                        <Menu
+                            anchorEl={anchorAuth}
+                            open={Boolean(anchorAuth)}
+                            onClose={closeAuthMenu}
+                            disableScrollLock
+                        >
+                            <MenuItem
+                                component={Link}
+                                to={'/login'}
+                                onClick={closeAuthMenu}
+                                sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
+                            >
+                                Log in
+                            </MenuItem>
+                            <MenuItem
+                                component={Link}
+                                to={'/signup'}
+                                onClick={closeAuthMenu}
+                                sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
+                            >
+                                Sign up
+                            </MenuItem>
+                        </Menu>
+                        </>
+                       )}
                         <Box sx={{
                             ml:{ xs: 1, lg: 4, xl: 12 }
                         }}>

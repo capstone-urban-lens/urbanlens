@@ -1,29 +1,23 @@
 import Typography from "@mui/material/Typography";
-import { Box, Button, InputAdornment, TextField, IconButton } from "@mui/material";
+import { Box, Button, InputAdornment, TextField, IconButton, Alert } from "@mui/material";
 import background from "../../assets/img/login-bg.jpg";
 import { useTheme } from "@mui/material/styles";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useState, useEffect } from "react";
-// import supabase from "../../services/supabase";
+import { useState } from "react";
+import { logIn } from "../../services/auth";
 
 function login () {
 
-    // useEffect(() => {
-    //     async function testConnection() {
-    //         const { data, error } = await supabase.from('cities').select('*')
-    //         if (error) {
-    //         console.error('Supabase connection failed:', error.message)
-    //         } else {
-    //         console.log('Supabase connected! Data:', data)
-    //         }
-    //     }
-    //     testConnection()
-    //     }, [])
-
     const theme = useTheme();
+    const navigate = useNavigate();
+
     const [showPw, setShowPw] = useState(false);
+    const [email, setEmail] = useState('');
+    const [pw, setPw] = useState('');
+    const [error, setError] = useState(null);
+
     const handleClickShowPw = () => setShowPw((show) => !show);
     const handleMouseDownPw = (e) => {
         e.preventDefault();
@@ -31,8 +25,15 @@ function login () {
     const handleMouseUpPw = (e) => {
         e.preventDefault();
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
+        try {
+            await logIn(email, pw);
+            navigate('/account')
+        } catch (err) {
+            setError(err.message);
+        }
     }
 
     return (
@@ -67,13 +68,17 @@ function login () {
                 justifyContent: 'center',
             }}
             >
-                <Typography variant="h2" color="text">Login</Typography>
+                <Typography variant="h2" color="text">Log in</Typography>
                 <Box component="form" onSubmit={handleSubmit}
                 sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 3,
                     width: '70%',
                 }}
                 >
-                    <TextField id="email" label="email" variant="filled" required slotProps={{
+                    {error && <Alert severity="error">{error}</Alert>}
+                    <TextField id="email" label="email" variant="filled" required 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    slotProps={{
                         input: {
                             sx: {
                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -83,7 +88,10 @@ function login () {
                             },
                         },
                     }} />
-                    <TextField id="pw" label="password" variant="filled" required type={showPw ? 'text' : 'password'} slotProps={{
+                    <TextField id="pw" label="password" variant="filled" required type={showPw ? 'text' : 'password'}
+                    value={pw} 
+                    onChange={(e) => setPw(e.target.value)}
+                    slotProps={{
                         input: {
                             sx: {
                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -110,8 +118,6 @@ function login () {
                     />
                     <Button
                     variant="contained"
-                    component={Link}
-                    to="/account"
                     size="large"
                     type="submit"
                     sx={{

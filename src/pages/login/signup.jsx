@@ -6,12 +6,20 @@ import { Link, useNavigate } from "react-router-dom";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from "react";
+import { signUp } from "../../services/auth";
+
 
 function Signup () {
 
     const theme = useTheme();
     const navigate = useNavigate();
     const [showPw, setShowPw] = useState(false);
+    const [email, setEmail] = useState('');
+    const [pw, setPw] = useState('');
+    const [confirmPw, setConfirmPw] = useState('');
+
+    const [error, setError] = useState(null);
+    
     const [alertMsg, setAlertMsg] = useState(null);
 
     const showAlert = (msg) => {
@@ -25,10 +33,20 @@ function Signup () {
     const handleMouseUpPw = (e) => {
         e.preventDefault();
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        showAlert('Account created successfully!');
-        setTimeout(() => navigate('/explore'), 800)
+        setError(null);
+        if (pw !== confirmPw) {
+            setError("Passwords do not match");
+            return;
+        }
+        try {
+            await signUp(email, pw)
+            showAlert('Account created successfully!');
+            setTimeout(() => navigate('/account'), 800)
+        } catch (err) {
+            setError(err.message);
+        }
     }
 
     return (
@@ -70,6 +88,7 @@ function Signup () {
                     width: '70%',
                 }}
                 >   
+                    {error && <Alert severity="error">{error}</Alert>}
                     <TextField id="fname" label="first name" variant="filled" required slotProps={{
                         input: {
                             sx: {
@@ -90,7 +109,10 @@ function Signup () {
                             },
                         },
                     }} />
-                    <TextField id="email" label="email" variant="filled" slotProps={{
+                    <TextField id="email" label="email" variant="filled" required 
+                    value={email}
+                    onChange={(e) => setEmail (e.target.value)}
+                    slotProps={{
                         input: {
                             sx: {
                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -100,7 +122,10 @@ function Signup () {
                             },
                         },
                     }} />
-                    <TextField id="pw" label="password" variant="filled" type={showPw ? 'text' : 'password'} slotProps={{
+                    <TextField id="pw" label="password" variant="filled" required 
+                    value={pw}
+                    onChange={(e) => setPw (e.target.value)}
+                    type={showPw ? 'text' : 'password'} slotProps={{
                         input: {
                             sx: {
                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -125,7 +150,11 @@ function Signup () {
                         },
                         }}
                     />
-                    <TextField id="confirmpw" label="confirm password" variant="filled" type={showPw ? 'text' : 'password'} slotProps={{
+                    <TextField id="confirmpw" label="confirm password" variant="filled" required
+                    value={confirmPw}
+                    onChange={(e) => setConfirmPw(e.target.value)}
+                    type={showPw ? 'text' : 'password'} 
+                    slotProps={{
                         input: {
                             sx: {
                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
