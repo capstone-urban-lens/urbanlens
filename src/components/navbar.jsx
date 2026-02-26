@@ -70,24 +70,10 @@ function navbar() {
                                     >{page.label}
                                     </MenuItem>
                                 ))}
-                                {authItems.map((item)=>(
-                                    <MenuItem
-                                    key={item.path}
-                                    component={Link}
-                                    to={item.path}
-                                    onClick={closeMenu}
-                                    sx={{
-                                        fontFamily: '"Pontano Sans", sans-serif',
-                                    }}
-                                    >{item.label}
-                                    </MenuItem>
-                                ))}
-                                <MenuItem
-                                    onClick={handleSignOut}
-                                    sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
-                                >
-                                    Sign Out
-                                </MenuItem>
+                                {user && <MenuItem component={Link} to={'/account'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>My Account</MenuItem>}
+                                {user && <MenuItem onClick={handleSignOut} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign Out</MenuItem>}
+                                {!user && <MenuItem component={Link} to={'/login'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Log in</MenuItem>}
+                                {!user && <MenuItem component={Link} to={'/signup'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign up</MenuItem>}
                             </MenuList>
                         </Menu>
                         <SearchBar />
@@ -232,24 +218,6 @@ function navbar() {
                             <SearchBar />
                         </Box>
                     </Box>
-                    {/* <Box sx={{display:{xs: 'flex', md: 'none'}}}>
-                        <IconButton size='large' edge='start' color='inherit' onClick={openMenu}>
-                            <MenuIcon />
-                        </IconButton>
-                        <Menu anchorEl={anchorNav} open={Boolean(anchorNav)} onClose={closeMenu} sx={{display:{xs: 'flex', md: 'none'}}} disableScrollLock>
-                            <MenuList>
-                                {pages.map((page)=>(
-                                    <MenuItem
-                                    key={page.path}
-                                    component={Link}
-                                    to={page.path}
-                                    onClick={closeMenu}
-                                    >{page.label}
-                                    </MenuItem>
-                                ))}
-                            </MenuList>
-                        </Menu>
-                    </Box> */}
                 </Toolbar>
             </AppBar>
         
