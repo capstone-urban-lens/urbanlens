@@ -133,7 +133,7 @@ function login () {
                 <Link
                 to="/signup"
                 style={{
-                    margiTop: '3rem',
+                    marginTop: '3rem',
                     fontSize: '0.9rem',
                     color: theme.palette.text.main
                 }}  
