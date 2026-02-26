@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppBar, Toolbar, IconButton, Box, Button, Menu, MenuList, MenuItem } from "@mui/material";
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { signOut } from '../services/auth';
@@ -16,12 +16,7 @@ const pages=[
     { label: 'Community Board', path: '/communityboard' },
 ];
 
-const authItems = [
-    { label: 'Log In', path: '/login' },
-    { label: 'Sign Up', path: '/signup' },
-];
-
-function navbar() {
+function Navbar() {
     const [anchorNav, setAnchorNav] = useState(null);
     const [anchorAuth, setAnchorAuth] = useState(null);
     const navigate = useNavigate();
@@ -30,7 +25,7 @@ function navbar() {
     const handleSignOut = async () => {
         closeAuthMenu();
         closeMenu();
-        await signOut();
+        await signOut().catch(() => {});
         navigate('/login');
     };
 
@@ -47,6 +42,10 @@ function navbar() {
     const closeAuthMenu = () => {
         setAnchorAuth(null);
     };
+    useEffect(() => {
+        closeAuthMenu();
+    }, [user]);
+
     return (
         <>
             <AppBar position="static">
@@ -225,4 +224,4 @@ function navbar() {
     )
 }
 
-export default navbar
+export default Navbar
