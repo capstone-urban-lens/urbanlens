@@ -79,8 +79,8 @@ function Navbar() {
                                     </>
                                 ) : (
                                     <>
-                                        <MenuItem component={Link} to={'/login'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Log in</MenuItem>
-                                        <MenuItem component={Link} to={'/signup'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign up</MenuItem>
+                                        <MenuItem component={Link} to={'/login'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Log In</MenuItem>
+                                        <MenuItem component={Link} to={'/signup'} onClick={closeMenu} sx={{ fontFamily: '"Pontano Sans", sans-serif' }}>Sign Up</MenuItem>
                                     </>
                                 ))}
                             </MenuList>
@@ -213,7 +213,7 @@ function Navbar() {
                                 onClick={closeAuthMenu}
                                 sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
                             >
-                                Log in
+                                Log In
                             </MenuItem>
                             <MenuItem
                                 component={Link}
@@ -221,7 +221,7 @@ function Navbar() {
                                 onClick={closeAuthMenu}
                                 sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
                             >
-                                Sign up
+                                Sign Up
                             </MenuItem>
                         </Menu>
                         </>

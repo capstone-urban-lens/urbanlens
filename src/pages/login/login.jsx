@@ -72,7 +72,7 @@ function login () {
                 justifyContent: 'center',
             }}
             >
-                <Typography variant="h2" color="text">Log in</Typography>
+                <Typography variant="h2" color="text">Log In</Typography>
                 <Box component="form" onSubmit={handleSubmit}
                 sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 3,
                     width: '70%',

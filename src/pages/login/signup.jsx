@@ -16,6 +16,8 @@ function Signup () {
     const [showPw, setShowPw] = useState(false);
     const [email, setEmail] = useState('');
     const [pw, setPw] = useState('');
+    const [fname, setFname] = useState('');
+    const [lname, setLname] = useState('');
     const [confirmPw, setConfirmPw] = useState('');
 
     const [error, setError] = useState(null);
@@ -41,7 +43,7 @@ function Signup () {
             return;
         }
         try {
-            const data = await signUp(email, pw);
+            const data = await signUp(email, pw, fname, lname);
             if (data.session) {
                 showAlert('Account created successfully!');
                 setTimeout(() => navigate('/account'), 800);
@@ -86,14 +88,17 @@ function Signup () {
                 justifyContent: 'center',
             }}
             >
-                <Typography variant="h2" color="text">Create Account</Typography>
+                <Typography variant="h2" color="text">Sign Up</Typography>
                 <Box component="form" onSubmit={handleSubmit}
                 sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 3,
                     width: '70%',
                 }}
                 >   
                     {error && <Alert severity="error">{error}</Alert>}
-                    <TextField id="fname" label="first name" variant="filled" required slotProps={{
+                    <TextField id="fname" label="first name" variant="filled" required 
+                    value={fname}
+                    onChange={(e) => setFname (e.target.value)}
+                    slotProps={{
                         input: {
                             sx: {
                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -103,7 +108,10 @@ function Signup () {
                             },
                         },
                     }} />
-                    <TextField id="lname" label="last name" variant="filled" required slotProps={{
+                    <TextField id="lname" label="last name" variant="filled" required 
+                    value={lname}
+                    onChange={(e) => setLname (e.target.value)}
+                    slotProps={{
                         input: {
                             sx: {
                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
