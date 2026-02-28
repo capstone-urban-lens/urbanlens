@@ -1,13 +1,21 @@
 import supabase from './supabase';
 
+function normalizeName(name = "") {
+  if (!name) return "";
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
+
 export async function signUp(email, password, fname, lname) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
-        fname,
-        lname
+        fname: normalizeName(fname),
+        lname: normalizeName(lname)
       }
     }
   })
@@ -29,16 +37,4 @@ export async function logIn(email, password) {
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
   if (error) throw error
-}
-
-export async function getSession() {
-  const { data, error } = await supabase.auth.getSession()
-  if (error) throw error
-  return data.session
-}
-
-export async function getUser() {
-  const { data, error } = await supabase.auth.getUser()
-  if (error) throw error
-  return data.user
 }

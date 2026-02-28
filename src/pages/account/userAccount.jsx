@@ -1,21 +1,53 @@
-import { Box, Typography, Grid, Snackbar, Alert, } from "@mui/material";
-import John from "../../assets/img/usersImages/john_doe.jpg";
+import { Box, Typography, Grid, Snackbar, Alert, Avatar, IconButton, TextField, Button, CircularProgress, Tooltip } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import Cities from "../../components/citiesInfo";
 import CityCard from "../../components/cityCard";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, } from "react";
+import { useState, useEffect, useRef } from "react";
 import replies from "../../components/mockComments.js";
 import CommunityMsg from "../community/communityMsg.jsx";
-import { useTheme, alpha } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
+import { useAuth } from "../../context/AuthContext";
+import { getProfile, updateProfile, uploadAvatar, getProfilePicUrl } from "../../services/profiles";
+import defaultPfp from "../../assets/img/default_pfp.jpg";
 
-function userAccount() {
+function UserAccount() {
   const myCities = Cities.slice(6, 8);
   const theme = useTheme();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState(null);
+
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioValue, setBioValue] = useState("");
+  const [bioSaving, setBioSaving] = useState(false);
+
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarVersion, setAvatarVersion] = useState(null);
 
   const [alertMsg, setAlertMsg] = useState(null);
+  const [alertSeverity, setAlertSeverity] = useState("success");
 
   const [compareList, setCompareList] = useState([]);
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) return;
+    setProfileLoading(true);
+    getProfile(user.id)
+      .then((data) => {
+        setProfile(data);
+        setBioValue(data.bio ?? "");
+      })
+      .catch((err) => setProfileError(err.message))
+      .finally(() => setProfileLoading(false));
+  }, [user]);
 
   useEffect(() => {
     if (compareList.length === 2) {
@@ -23,6 +55,49 @@ function userAccount() {
       setCompareList([]);
     }
   }, [compareList, navigate]);
+
+  const handleBioSave = async () => {
+    setBioSaving(true);
+    try {
+      const updated = await updateProfile(user.id, { bio: bioValue });
+      setProfile((prev) => ({ ...prev, bio: updated.bio }));
+      setEditingBio(false);
+      setAlertSeverity("success");
+      setAlertMsg("Bio updated!");
+    } catch (err) {
+      setAlertSeverity("error");
+      setAlertMsg(err.message);
+    } finally {
+      setBioSaving(false);
+    }
+  };
+
+  const handleBioCancel = () => {
+    setBioValue(profile?.bio ?? "");
+    setEditingBio(false);
+  };
+
+  const handleAvatarClick = () => fileInputRef.current?.click();
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const path = await uploadAvatar(user.id, file);
+      const updated = await updateProfile(user.id, { profile_pic: path });
+      setProfile((prev) => ({ ...prev, profile_pic: updated.profile_pic }));
+      setAvatarVersion(Date.now());
+      setAlertSeverity("success");
+      setAlertMsg("Profile picture updated!");
+    } catch (err) {
+      setAlertSeverity("error");
+      setAlertMsg(err.message);
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const handleCompare = (slug) => {
     setCompareList((prev) => {
@@ -63,66 +138,114 @@ function userAccount() {
             pt: 2,
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
+            alignItems: { md: "center" },
+            gap: 3,
+            mt: 2,
           }}
         >
-          <Box
-            component="img"
-            src={John}
-            sx={{
-              height: "200px",
-              width: "200px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              objectPosition: "center 20%",
-              mr: 4,
-              mb: 3,
-            }}
-          />
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              mb: { xs: 2, md: 0 },
-            }}
-          >
+          {/* Avatar with upload overlay */}
+          <Box sx={{ position: "relative", width: 200, height: 200, flexShrink: 0 }}>
+            <Avatar
+              src={profile?.profile_pic ? getProfilePicUrl(profile.profile_pic, avatarVersion) : defaultPfp}
+              sx={{ width: 200, height: 200 }}
+            />
+            <Tooltip title="Change profile picture">
+              <Box
+                onClick={handleAvatarClick}
+                sx={{
+                  position: "absolute", inset: 0, borderRadius: "50%",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  bgcolor: "rgba(0,0,0,0.35)", opacity: 0,
+                  transition: "opacity 0.2s", cursor: "pointer",
+                  "&:hover": { opacity: 1 },
+                }}
+              >
+                {avatarUploading
+                  ? <CircularProgress size={32} sx={{ color: "#fff" }} />
+                  : <PhotoCameraIcon sx={{ color: "#fff", fontSize: 36 }} />}
+              </Box>
+            </Tooltip>
+            <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleAvatarChange} />
+          </Box>
+
+          {/* Name & Email */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
             <Typography variant="body3" color="text">
-              Johnny Danger
+              {profile ? `${profile.fname ?? ""} ${profile.lname ?? ""}`.trim() : ""}
             </Typography>
             <Typography variant="body1" color="primary">
-              johnnydanger@example.com
+              {user?.email}
             </Typography>
           </Box>
         </Box>
-        <Typography
-          variant="body3"
-          color="text"
-          sx={{
-            ml: 2,
-          }}
-        >
-          Bio
-        </Typography>
-        <Typography
-          variant="body2"
-          color="text"
-          sx={{
-            backgroundColor: "rgba(144, 170, 85, 0.15)",
-            maxWidth: { xs: "80vw", md: "45vw" },
-            padding: 3,
-            borderRadius: 3,
-            mt: { xs: 1, md: 0 },
-          }}
-        >
-          In my thirties now, I’ve become pretty intentional about where my
-          money goes and how I want to live. UrbanLens helps me make sense of
-          the real cost of living in the city — not just rent and bills, but the
-          everyday stuff like food, commutes, and weekend plans. I like getting
-          to compare experiences with other people who are trying to balance
-          comfort, affordability, and a lifestyle that still feels enjoyable.
-          When I’m not scrolling through cost breakdowns, you’ll usually find me
-          exploring neighborhoods, trying out local restaurants, or looking for
-          ways to stretch a dollar without sacrificing the things I love.
-        </Typography>
+        {/* Bio label + pencil icon */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 3, mb: 1 }}>
+          <Typography variant="body3" color="text">Bio</Typography>
+          {!editingBio && (
+            <IconButton size="small" onClick={() => setEditingBio(true)}>
+              <EditIcon fontSize="medium" />
+            </IconButton>
+          )}
+        </Box>
+
+        {/* Bio — view or edit mode */}
+        {editingBio ? (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <TextField
+              multiline
+              minRows={4}
+              fullWidth
+              autoFocus
+              value={bioValue}
+              onChange={(e) => setBioValue(e.target.value)}
+              disabled={bioSaving}
+              sx={{
+                maxWidth: { xs: "80vw", md: "45vw" },
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "rgba(144, 170, 85, 0.15)",
+                  borderRadius: 3,
+                  "& fieldset": { borderColor: "rgba(144, 170, 85, 0.6)" },
+                },
+              }}
+            />
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={bioSaving ? <CircularProgress size={14} color="inherit" /> : <CheckIcon />}
+                onClick={handleBioSave}
+                disabled={bioSaving}
+              >
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<CloseIcon />}
+                onClick={handleBioCancel}
+                disabled={bioSaving}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Typography
+            variant="body2"
+            onClick={() => setEditingBio(true)}
+            sx={{
+              backgroundColor: "rgba(144, 170, 85, 0.15)",
+              maxWidth: { xs: "80vw", md: "45vw" },
+              padding: 3,
+              borderRadius: 3,
+              cursor: "text",
+              fontStyle: profile?.bio ? "normal" : "italic",
+              color: profile?.bio ? "inherit" : "text.secondary",
+            }}
+          >
+            {profile?.bio || "Share a little about yourself — your favorite city, way of living, or what brought you to UrbanLens."}
+          </Typography>
+        )}
         <Box
           sx={{
             my: 2,
@@ -223,7 +346,7 @@ function userAccount() {
       >
         <Alert
           onClose={() => setAlertMsg(null)}
-          severity="success"
+          severity={alertSeverity}
           variant="standard"
         >
           {alertMsg}
@@ -232,4 +355,4 @@ function userAccount() {
     </>
   );
 }
-export default userAccount;
+export default UserAccount;

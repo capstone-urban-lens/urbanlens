@@ -28,8 +28,14 @@ function Navbar() {
         setSigningOut(true);
         closeAuthMenu();
         closeMenu();
-        await signOut().catch(() => {});
-        navigate('/login');
+        try {
+            await signOut();
+        } catch {
+            
+        } finally {
+            setSigningOut(false);
+            navigate('/login');
+        }
     };
 
     const openMenu = (event)=>{
