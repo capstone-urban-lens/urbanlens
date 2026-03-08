@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import CommunityMsg from "../community/communityMsg.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useAuth } from "../../context/AuthContext";
-import { getUserComments } from "../../services/comments.js";
+import { getUserComments, deleteComment } from "../../services/comments.js";
 import { getProfile, updateProfile, uploadAvatar, getProfilePicUrl } from "../../services/profiles";
 import defaultPfp from "../../assets/img/default_pfp.jpg";
 
@@ -87,6 +87,11 @@ function UserAccount() {
   const handleBioCancel = () => {
     setBioValue(profile?.bio ?? "");
     setEditingBio(false);
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    await deleteComment(commentId);
+    setUserComments(userComments.filter(c => c.comment_id !== commentId));
   };
 
   const handleAvatarClick = () => fileInputRef.current?.click();
@@ -342,6 +347,8 @@ function UserAccount() {
                 image={getProfilePicUrl(profile?.profile_pic)}
                 date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
                 message={comment.msg}
+                isOwner
+                onDelete={() => handleDeleteComment(comment.comment_id)}
                 />
               </Grid>
             ))}

@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCities";
-import { getComments, postComment } from "../../services/comments.js";
+import { getComments, postComment, deleteComment } from "../../services/comments.js";
 import { getProfilePicUrl } from "../../services/profiles.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { Box, Typography, Button, useTheme, Snackbar, Alert } from "@mui/material";
@@ -14,6 +14,7 @@ import TextField from '@mui/material/TextField';
 
 //TODO about pagination 
 //Backend TODO - consider incorporating counter for likes button 
+//add ability for users to delete their own comments 
 
 function community() {
 
@@ -48,6 +49,11 @@ function community() {
     fetchData();
     setOption(citySlug);
   }, [citySlug]);
+
+  async function handleDeleteComment(commentId) {
+    await deleteComment(commentId);
+    setComments(comments.filter(c => c.comment_id !== commentId));
+  }
 
   async function handlePostComment(e) {
     e.preventDefault();
@@ -199,11 +205,13 @@ function community() {
                 </form>
               </Box>
               {comments.map((comment) => (
-                <CommunityMsg key={comment.comment_id} 
+                <CommunityMsg key={comment.comment_id}
                 name={`${comment.profiles.fname} ${comment.profiles.lname}`}
                 image={getProfilePicUrl(comment.profiles.profile_pic)}
                 date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
                 message={comment.msg}
+                isOwner={user && comment.user_id === user.id}
+                onDelete={() => handleDeleteComment(comment.comment_id)}
                 />
               ))}
             </Box>

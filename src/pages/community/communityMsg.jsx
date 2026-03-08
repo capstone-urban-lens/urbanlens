@@ -1,12 +1,13 @@
 import { Box, Typography, Grid, IconButton } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { LuReply } from "react-icons/lu";
 import theme from "../../theme";
 import { useState } from "react";
 
 
-function communityMsg({ name, image, date, message, fullWidth, defaultLiked=false }) {
+function communityMsg({ name, image, date, message, fullWidth, defaultLiked=false, isOwner=false, onDelete }) {
 
     const [liked, setLiked] = useState(defaultLiked);
 
@@ -75,6 +76,11 @@ function communityMsg({ name, image, date, message, fullWidth, defaultLiked=fals
                                 <IconButton onClick={()=> setLiked(!liked)} sx={{ color: theme.palette.primary.main }}>
                                     {liked ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
                                 </IconButton>
+                                {isOwner && (
+                                    <IconButton onClick={onDelete} sx={{ color: theme.palette.primary.main }}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                )}
                             </Box>
                         </Box>
                     </Box>
