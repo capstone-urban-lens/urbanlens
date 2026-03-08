@@ -7,12 +7,15 @@ import Cities from "../../components/citiesInfo";
 import CityCard from "../../components/cityCard";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import replies from "../../components/mockComments.js";
 import CommunityMsg from "../community/communityMsg.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useAuth } from "../../context/AuthContext";
+import { getUserComments } from "../../services/comments.js";
 import { getProfile, updateProfile, uploadAvatar, getProfilePicUrl } from "../../services/profiles";
 import defaultPfp from "../../assets/img/default_pfp.jpg";
+
+//add city to show which city the comment was posted on
+//should i update my posts to show post the user liked?
 
 function UserAccount() {
   const myCities = Cities.slice(6, 8);
@@ -21,6 +24,7 @@ function UserAccount() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
+  const [userComments, setUserComments] = useState([]);
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState(null);
@@ -48,6 +52,14 @@ function UserAccount() {
       .catch((err) => setProfileError(err.message))
       .finally(() => setProfileLoading(false));
   }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    getUserComments(user.id)
+      .then((data) => setUserComments(data))
+      .catch((err) => console.error(err.message));
+  }, [user]);
+
 
   useEffect(() => {
     if (compareList.length === 2) {
@@ -302,7 +314,7 @@ function UserAccount() {
           }}
         >
           <Typography variant="h2" color="text">
-            Liked Posts
+            My Posts
           </Typography>
           <Grid
             container
@@ -318,20 +330,18 @@ function UserAccount() {
               scrollbarColor: `${theme.palette.primary.main} transparent`,
             }}
           >
-            {replies.map((reply) => (
+            {userComments.map((comment) => (
               <Grid
                 size={{ xs: 12, md: 6, xl: 4, }}
-                key={reply.id}
+                key={comment.comment_id}
                 sx={{ flexShrink: { lg: 0 } }}
               >
                 <CommunityMsg
-                  name={reply.name}
-                  image={reply.image}
-                  date={reply.date}
-                  message={reply.msg}
-                  fullWidth
-                  defaultLiked={true}
-
+                fullWidth
+                name={`${profile?.fname ?? ''} ${profile?.lname ?? ''}`.trim()}
+                image={getProfilePicUrl(profile?.profile_pic)}
+                date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
+                message={comment.msg}
                 />
               </Grid>
             ))}

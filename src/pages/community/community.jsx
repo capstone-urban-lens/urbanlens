@@ -1,22 +1,26 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCities";
-import { Box, Typography, Button, useTheme } from "@mui/material";
+import { getComments, postComment } from "../../services/comments.js";
+import { getProfilePicUrl } from "../../services/profiles.js";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { Box, Typography, Button, useTheme, Snackbar, Alert } from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select  from '@mui/material/Select';
-import MockComments from "../../components/mockComments.js";
 import CommunityMsg from "./communityMsg.jsx";
 import TextField from '@mui/material/TextField';
-import JohnDoe from "../../assets/img/usersImages/john_doe.jpg"
 
 //TODO about pagination 
 //Backend TODO - consider incorporating counter for likes button 
 
 function community() {
 
-  const [comments, setComments] = useState(MockComments);
+  const { user } = useAuth();
+
+  const [alertMsg, setAlertMsg] = useState(null);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const { citySlug } = useParams();
   const navigate = useNavigate();
@@ -33,8 +37,10 @@ function community() {
           getCities(),
           getCityBySlug(citySlug),
         ]);
+        const commentsData = await getComments(cityData.city_id);
         setCities(citiesData);
         setCity(cityData);
+        setComments(commentsData);
       } catch (err) {
         console.error('Failed to fetch city data:', err.message);
       }
@@ -43,20 +49,14 @@ function community() {
     setOption(citySlug);
   }, [citySlug]);
 
-  const handlePostComment = (e) => {
+  async function handlePostComment(e) {
     e.preventDefault();
-
-    if (!newComment.trim()) return;
-
-    const commentToAdd = {
-      id: comments.length + 1,
-      name: "Johnny Danger",
-      image: JohnDoe,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      msg: newComment,
-    };
-
-    setComments([...comments, commentToAdd ]);
+    if (!user) {
+      setAlertMsg('Please log in to post a comment');
+      return;
+    }
+    const comment = await postComment(city.city_id, user.id, newComment);
+    setComments([comment, ...comments]);
     setNewComment("");
   }
 
@@ -198,11 +198,11 @@ function community() {
                   </Button>
                 </form>
               </Box>
-              {comments.slice().reverse().map((comment) => (
-                <CommunityMsg key={comment.id} 
-                name={comment.name}
-                image={comment.image}
-                date={comment.date}
+              {comments.map((comment) => (
+                <CommunityMsg key={comment.comment_id} 
+                name={`${comment.profiles.fname} ${comment.profiles.lname}`}
+                image={getProfilePicUrl(comment.profiles.profile_pic)}
+                date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
                 message={comment.msg}
                 />
               ))}
@@ -212,7 +212,16 @@ function community() {
         </Box>
         
       </Box>
-         
+      <Snackbar
+        open={!!alertMsg}
+        autoHideDuration={2500}
+        onClose={() => setAlertMsg(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setAlertMsg(null)} severity="error" variant="standard">
+          {alertMsg}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

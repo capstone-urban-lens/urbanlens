@@ -8,6 +8,14 @@ export async function getComments(cityId) {
     return data;
 }
 
+export async function getUserComments(userId) {
+    const { data, error } = await supabase.from('comments')
+    .select('*')
+    .eq('user_id', userId)
+    if (error) throw error;
+    return data;
+}
+
 export async function postComment(cityId, userId, msg) {
     const {data, error } = await supabase.from('comments')
     .insert({city_id: cityId, user_id: userId, msg: msg})
