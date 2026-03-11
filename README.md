@@ -104,7 +104,10 @@ This project also supports running the frontend using **Docker**, allowing for a
    ```bash
    cd urbanlens
    ```
-3. Start the application using Docker Compose:
+
+3. Create .env file using variables defined in .env.example and values provided (via Canvas)
+
+4. Start the application using Docker Compose:
    ```bash
    docker compose up --build
    ```
@@ -117,15 +120,12 @@ docker build -t urban-lens .
 docker run -p 8080:3000 urban-lens
 ```
 
-> Note: Docker support is currently focused on the frontend while the backend is in development.
-
 ---
 
 ## 📖 Future Improvements
 
-- User accounts and saved/favorite cities
-- Expanded datasets and filters
-- Enhanced comparison visualizations
+- Ability to save/favorite cities
+- Implement city filtering
 - Performance optimizations
 
 ---
