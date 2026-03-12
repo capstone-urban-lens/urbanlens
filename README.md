@@ -68,7 +68,7 @@ Our goals with this project were to:
 ## 🚀 Live Demo
 
 🔗 **Vercel Deployment:**\
-[https://urbanlens-gules.vercel.app/](https://urbanlens-gules.vercel.app/) 
+[https://www.urbanlens.pro/](https://www.urbanlens.pro/) 
 
 ---
 
