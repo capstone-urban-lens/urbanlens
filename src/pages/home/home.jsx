@@ -361,44 +361,46 @@ function home() {
                 Here is a list of our sources:
               </Typography>
               <Box
-              component="ul"
-              sx={{
-                padding: '0',
-                listStyle: 'none',
-                color: theme.palette.primary.main
-              }}
+                component="ul"
+                sx={{
+                  padding: '0',
+                  listStyle: 'none',
+                  color: theme.palette.primary.main
+                }}
               >
                 {[
-                'U.S. Census Bureau (ACS): Housing, Income, and Commute Statistics',
-                'Bureau of Labor Statistics (BLS): Employment and Wage Data',
-                'FBI Crime Data Explorer: Violent and Property Crime Rates',
-                'NOAA NCEI: Weather and Climate Information',
-                'Trust for Public Land: Park and Green Space Indices',
-              ].map((text) => (
-                <Box key={text} component="li">
-                  <Box
-                    component="a"
-                    href="https://www.census.gov/en.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{
-                      color: 'inherit',          
-                      textDecoration: 'underline',
-                      cursor: 'pointer',
-                      '&:visited': {
-                        color: 'inherit',        
-                      },
-                      '&:hover': {
+                  {
+                    text: 'Data USA: the definitve place to explore US public Data',
+                    href: 'https://datausa.io/',
+                  },
+                  {
+                    text: 'Home Snacks: city data ranked across 60+ categories',
+                    href: 'https://www.homesnacks.com/',
+                  },
+                ].map(({ text, href }) => (
+                  <Box key={text} component="li">
+                    <Box
+                      component="a"
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        color: 'inherit',
                         textDecoration: 'underline',
-                      },
-                    }}
-                  >
-                    {text}
+                        cursor: 'pointer',
+                        '&:visited': {
+                          color: 'inherit',
+                        },
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        },
+                      }}
+                    >
+                      {text}
+                    </Box>
                   </Box>
-                </Box>
-              ))}
-              </Box>
-
+                ))}
+            </Box>
           </Grid>
         </Grid>
        </Box>
