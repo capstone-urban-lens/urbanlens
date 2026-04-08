@@ -39,7 +39,7 @@ function community() {
           getCityBySlug(citySlug),
         ]);
         const commentsData = await getComments(cityData.city_id);
-        setCities(citiesData);
+        setCities([...citiesData].sort((a, b) => a.title.localeCompare(b.title)));
         setCity(cityData);
         setComments(commentsData);
       } catch (err) {

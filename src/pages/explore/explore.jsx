@@ -53,7 +53,7 @@ function explore() {
     if (sortOrder === 'high-to-low') {
       return [...cities].sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
     }
-    return cities;
+    return [...cities].sort((a, b) => a.title.localeCompare(b.title));
   };
 
   const filteredCities = getFilteredCities();

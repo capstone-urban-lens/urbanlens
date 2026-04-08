@@ -20,7 +20,7 @@ function compareCities() {
         async function fetchCities() {
             try {
                 const data = await getCities();
-                setCities(data);
+                setCities([...data].sort((a, b) => a.title.localeCompare(b.title)));
             } catch (err) {
                 console.error('Failed to fetch cities:', err.message);
                 setError(true);
