@@ -8,8 +8,6 @@ import {
   Box,
   useTheme
 } from "@mui/material";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { IoIosGitCompare } from "react-icons/io";
@@ -20,12 +18,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 
-//and change the useState for a state that will persist for user logged in status and beyond refreshes
 
-function cityCard({ title, abbrev, subtitle, image, slug, onCompare, isComparing, defaultBookmarked = false, defaultLiked = false }) {
+function cityCard({ title, abbrev, subtitle, image, slug, onCompare, isComparing, defaultBookmarked = false }) {
 
     const [bookmarked, setBookmarked] = useState(defaultBookmarked);
-    const [liked, setLiked] = useState(defaultLiked);
     const [alertMsg, setAlertMsg] = useState(null);
 
     const showAlert = (msg) => {
@@ -105,9 +101,6 @@ function cityCard({ title, abbrev, subtitle, image, slug, onCompare, isComparing
         >
           <IconButton onClick={(e) => { e.preventDefault(); setBookmarked(!bookmarked); showAlert(bookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'); }} sx={{ color: theme.palette.accent.main }}>
             {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-          </IconButton>
-          <IconButton onClick={(e) => { e.preventDefault(); setLiked(!liked); showAlert(liked ? 'Removed from favorites' : 'Added to favorites'); }} sx={{ color: theme.palette.accent.main }}>
-            {liked ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
           </IconButton>
           <IconButton
             size="small"
