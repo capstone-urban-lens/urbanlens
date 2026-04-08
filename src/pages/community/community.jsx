@@ -112,7 +112,7 @@ function community() {
                   fontFamily: " 'Pontano Sans', serif"
                 }}
                 >
-                  {c.title}
+                  {c.title}, {c.abbrev}
                 </MenuItem>
               ))}
             </Select>
@@ -153,7 +153,7 @@ function community() {
                 my: 4,
                 width: '50vw' 
               }}
-            >{city.title}</Typography>
+            >{city.title}, {city.abbrev}</Typography>
             <Typography variant="h3" color="primary"
             sx={{
               mb: 4,

@@ -95,7 +95,7 @@ function SingleCityPage() {
                         sx={{ 
                             my: 4,
                         }}
-                        >City Details - <em>{city.title}</em></Typography>
+                        ><em>{city.title}</em>, {city.abbrev}</Typography>
                         <Typography
                         variant="body2">{city.description}</Typography>
                     </Box>
