@@ -9,6 +9,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 // import { IoIosGitCompare } from "react-icons/io";
 // import { IoMdGitCompare } from "react-icons/io";
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 function SingleCityPage() {
     const { citySlug } = useParams();
@@ -94,6 +95,18 @@ function SingleCityPage() {
                         </IconButton> */}
                     </Box>
                     <Box>
+                        <Button color="accent" variant="contained" component={Link}
+                        to="/explore"
+                        sx={{
+                            fontWeight: 600,
+                            fontFamily: "'Libre Baskerville'",
+                            fontSize: '1rem',
+                            mt: 2,
+                        }}
+                        >
+                        <ArrowBackIcon sx={{ fontSize: '1.1rem', mr: 0.5 }} />
+                        Explore More Cities
+                        </Button>
                         <Typography variant="h2" color="primary"
                         sx={{ 
                             my: 4,
@@ -166,7 +179,7 @@ function SingleCityPage() {
                                 mb: {xs: 2, md: 0}
                             }}
                             >
-                            Comment on this City 
+                            Comment on this City
                             </Button>
                         </Grid>
                         <Grid item size={{ xs: 12, md: 6}}

@@ -189,7 +189,7 @@ function Sidebar({ sortOrder, setSortOrder, population, setPopulation, climate, 
                       sx={{ backgroundColor: '#fff' }}
                       MenuProps={{ disableScrollLock: true }}
                     >
-                      {cities.map((c) => (
+                      {[...cities].sort((a, b) => a.title.localeCompare(b.title)).map((c) => (
                         <MenuItem key={c.slug} value={c.slug}
                         sx={{
                           fontFamily: " 'Pontano Sans', serif"
