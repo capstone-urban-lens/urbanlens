@@ -9,15 +9,12 @@ import {
   useTheme,
   Grid
 } from "@mui/material";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import EastIcon from '@mui/icons-material/East';
 import { IoIosGitCompare } from "react-icons/io";
 import { IoMdGitCompare } from "react-icons/io";
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -27,7 +24,6 @@ import { Link, useNavigate } from "react-router-dom";
 function cityCard({ title, abbrev, qol, image, population, climate, price, commute, cost_living, slug,  }) {
 
     const [bookmarked, setBookmarked] = useState(false);
-    const [liked, setLiked] = useState(false);
     const [alertMsg, setAlertMsg] = useState(null);
 
     const showAlert = (msg) => {
@@ -138,9 +134,7 @@ function cityCard({ title, abbrev, qol, image, population, climate, price, commu
           <IconButton onClick={(e) => { e.preventDefault(); setBookmarked(!bookmarked); showAlert(bookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'); }} sx={{ color: theme.palette.accent.main }}>
             {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
           </IconButton>
-          <IconButton onClick={(e) => { e.preventDefault(); setLiked(!liked); showAlert(liked ? 'Removed from favorites' : 'Added to favorites'); }} sx={{ color: theme.palette.accent.main }}>
-            {liked ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
-          </IconButton>
+          
           <IconButton
             size="small"
             sx={{ color: theme.palette.accent.main }}
