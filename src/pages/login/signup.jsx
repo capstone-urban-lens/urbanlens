@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography";
-import { Box, Button, InputAdornment, TextField, IconButton, Snackbar, Alert } from "@mui/material";
+import { Box, Button, InputAdornment, TextField, IconButton, Snackbar, Alert, CircularProgress } from "@mui/material";
 import background from "../../assets/img/login-bg.jpg";
 import { useTheme } from "@mui/material/styles";
 import { Link, useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ function Signup () {
     const [confirmPw, setConfirmPw] = useState('');
 
     const [error, setError] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     const [alertMsg, setAlertMsg] = useState(null);
 
@@ -42,16 +43,19 @@ function Signup () {
             setError("Passwords do not match");
             return;
         }
+        setIsSubmitting(true);
         try {
             const data = await signUp(email, pw, fname, lname);
             if (data.session) {
                 showAlert('Account created successfully!');
-                setTimeout(() => navigate('/account'), 800);
+                setTimeout(() => navigate('/account'), 1500);
             } else {
-                setError('Account creation failed. Please try again.'); //swap this line to check email if email confirmation is enabled later 
+                setError('Account creation failed. Please try again.'); //swap this line to check email if email confirmation is enabled later
+                setIsSubmitting(false);
             }
         } catch (err) {
             setError(err.message);
+            setIsSubmitting(false);
         }
     }
 
@@ -195,6 +199,7 @@ function Signup () {
                     variant="contained"
                     size="large"
                     type="submit"
+                    disabled={isSubmitting}
                     sx={{
                         mt: 2,
                         backgroundColor: theme.palette.primary.main,
@@ -202,7 +207,7 @@ function Signup () {
                         fontSize: '1.2rem'
                     }}
                     >
-                    Submit
+                    {isSubmitting ? <CircularProgress size={20} color="inherit" aria-label="loading" /> : 'Submit'}
                     </Button>
 
                 </Box>
