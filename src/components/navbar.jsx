@@ -66,6 +66,14 @@ function Navbar() {
                         </IconButton>
                         <Menu anchorEl={anchorNav} open={Boolean(anchorNav)} onClose={closeMenu} sx={{display:{xs: 'flex', md: 'none'}}} disableScrollLock>
                             <MenuList>
+                                <MenuItem
+                                    component={Link}
+                                    to={'/'}
+                                    onClick={closeMenu}
+                                    sx={{ fontFamily: '"Pontano Sans", sans-serif' }}
+                                >
+                                    Home
+                                </MenuItem>
                                 {pages.map((page)=>(
                                     <MenuItem
                                     key={page.path}
