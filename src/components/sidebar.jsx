@@ -26,7 +26,7 @@ function myValue(value) {
   return `${value}`;
 }
 
-function Sidebar({ sortOrder, setSortOrder }) {
+function Sidebar({ sortOrder, setSortOrder, population, setPopulation, climate, setClimate, qolRange, setQolRange, education, setEducation, costIndex, setCostIndex, gradRateCutoffs, costIndexCutoffs }) {
   const theme = useTheme();
   const [cities, setCities] = useState([]);
   const { citySlug } = useParams();
@@ -53,14 +53,17 @@ function Sidebar({ sortOrder, setSortOrder }) {
     navigate(`/citydetails/${newSlug}`);
   };
 
-  const [value, setValue] = useState([0, 100]);
   const mySlider = (e, newValue) => {
-    setValue(newValue);
+    setQolRange(newValue);
   };
 
-  const handleApply = () => {
-    setDrawerOpen(false);
-    // Add your filter logic here
+  const handleClear = () => {
+    setSortOrder('default');
+    setPopulation('');
+    setClimate('');
+    setQolRange([0, 100]);
+    setEducation('');
+    setCostIndex('');
   };
 
   const filterContent = (
@@ -73,17 +76,40 @@ function Sidebar({ sortOrder, setSortOrder }) {
       <Box
       sx={{
         pt: 3,
+        pb: 2,
        px: '0.8rem',
        display: 'flex',
        flexDirection: 'column',
        gap: 1,
       }}
       >
-        <Typography variant="h3" color="text"
-        
-        >
-          Filter Results
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="h3" color="text">Filter Results</Typography>
+          {(population || climate || education || costIndex || qolRange[0] > 0 || qolRange[1] < 100 || sortOrder !== 'default') && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleClear}
+              sx={{
+                backgroundColor: theme.palette.accent.main,
+                color: theme.palette.primary.main,
+                fontFamily: '"Pontano Sans", sans-serif',
+                fontSize: '0.8rem',
+                fontWeight: 'bold',
+                px: 1.5,
+                py: 0.25,
+                borderRadius: '20px',
+                boxShadow: 'none',
+                '&:hover': {
+                  backgroundColor: '#84c05e',
+                  boxShadow: 'none',
+                },
+              }}
+            >
+              Clear all
+            </Button>
+          )}
+        </Box>
         <Divider color="text">
         </Divider>
         <Typography variant="forms" color="text">
@@ -116,6 +142,8 @@ function Sidebar({ sortOrder, setSortOrder }) {
           <RadioGroup
             aria-labelledby="population-label"
             name="population-group"
+            value={population}
+            onChange={(e) => setPopulation(e.target.value)}
           >
             <FormControlLabel value="smallTowns" control={<Radio />} label="Under 50,000 (Small Towns)" />
             <FormControlLabel value="midSize" control={<Radio />} label="50,000 – 250,000 (Mid-Size Cities)" />
@@ -137,6 +165,8 @@ function Sidebar({ sortOrder, setSortOrder }) {
           <RadioGroup
             aria-labelledby="climate-label"
             name="climate-group"
+            value={climate}
+            onChange={(e) => setClimate(e.target.value)}
           >
             <FormControlLabel value="warm" control={<Radio />} label="Warm and Sunny" />
             <FormControlLabel value="mild" control={<Radio />} label="Moderate" />
@@ -178,7 +208,7 @@ function Sidebar({ sortOrder, setSortOrder }) {
           <Slider
             getAriaLabel={() => 'Quality-of-Life Score Range'}
             aria-labelledby="qol-slider"
-            value={value}
+            value={qolRange}
             onChange={mySlider}
             valueLabelDisplay='auto'
             getAriaValueText={myValue}
@@ -198,11 +228,12 @@ function Sidebar({ sortOrder, setSortOrder }) {
           <RadioGroup
             aria-labelledby="education-label"
             name="education-group"
+            value={education}
+            onChange={(e) => setEducation(e.target.value)}
           >
-            <FormControlLabel value="excellent" control={<Radio />} label="90 - 100% - Excellent" />
-            <FormControlLabel value="above avg" control={<Radio />} label="85% - 90% - Above Average" />
-            <FormControlLabel value="avg" control={<Radio />} label="60% - 85% - Average" />
-            <FormControlLabel value="below avg" control={<Radio />} label="0 - 60% - Below Average" />
+            <FormControlLabel value="high" control={<Radio />} label={gradRateCutoffs ? `High (${gradRateCutoffs.high + 1}%+)` : 'High'} />
+            <FormControlLabel value="avg" control={<Radio />} label={gradRateCutoffs ? `Average (${gradRateCutoffs.low}% – ${gradRateCutoffs.high}%)` : 'Average'} />
+            <FormControlLabel value="low" control={<Radio />} label={gradRateCutoffs ? `Low (under ${gradRateCutoffs.low}%)` : 'Low'} />
           </RadioGroup>
         </FormControl>
         <Divider color="text">
@@ -218,31 +249,14 @@ function Sidebar({ sortOrder, setSortOrder }) {
           <RadioGroup
             aria-labelledby="cost-index-label"
             name="overall-group"
+            value={costIndex}
+            onChange={(e) => setCostIndex(e.target.value)}
           >
-            <FormControlLabel value="affordable" control={<Radio />} label="Under 80 - Affordable" />
-            <FormControlLabel value="average" control={<Radio />} label="80 - 100 - Average" />
-            <FormControlLabel value="aa" control={<Radio />} label="100 - 120 - Above Average" />
-            <FormControlLabel value="expensive" control={<Radio />} label="120+ Expensive" />
+            <FormControlLabel value="high" control={<Radio />} label={costIndexCutoffs ? `Pricey (${costIndexCutoffs.high + 1}+)` : 'High'} />
+            <FormControlLabel value="avg" control={<Radio />} label={costIndexCutoffs ? `Average (${costIndexCutoffs.low} – ${costIndexCutoffs.high})` : 'Average'} />
+            <FormControlLabel value="low" control={<Radio />} label={costIndexCutoffs ? `Affordable (under ${costIndexCutoffs.low})` : 'Low'} />
           </RadioGroup>
         </FormControl>
-        <Button
-          variant="contained"
-          size="large"
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.background.default,
-            border: '2px solid',
-            borderColor: theme.palette.background.default,
-            alignSelf: 'flex-start',
-            width: '50%',
-            fontSize: '1.2rem',
-            mt: 2,
-            mb: 5,
-          }}
-          onClick={handleApply}
-        >
-          Apply
-        </Button>
 
       </Box>
     </Box>

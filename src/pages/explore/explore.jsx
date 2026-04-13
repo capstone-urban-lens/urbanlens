@@ -12,18 +12,38 @@ const parsePrice = (priceStr) => {
   return parseInt(String(priceStr).replace(/[$,]/g, ''), 10);
 };
 
+const computeCutoffs = (values) => {
+  const sorted = [...values].sort((a, b) => a - b);
+  return {
+    low: sorted[Math.floor(0.33 * (sorted.length - 1))],
+    high: sorted[Math.floor(0.67 * (sorted.length - 1))],
+  };
+};
+
 function explore() {
   const [sortOrder, setSortOrder] = useState('default');
+  const [population, setPopulation] = useState('');
+  const [climate, setClimate] = useState('');
+  const [qolRange, setQolRange] = useState([0, 100]);
+  const [education, setEducation] = useState('');
+  const [costIndex, setCostIndex] = useState('');
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get('search') || '';
   const [cities, setCities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [gradRateCutoffs, setGradRateCutoffs] = useState(null);
+  const [costIndexCutoffs, setCostIndexCutoffs] = useState(null);
 
   useEffect(() => {
     async function fetchCities() {
       try {
         const data = await getCities();
         setCities(data);
+
+        const gradRates = data.map(c => parseInt(String(c.hs_grad_rate).replace('%', ''), 10)).filter(v => !isNaN(v));
+        const costIndices = data.map(c => parseInt(String(c.cost_index), 10)).filter(v => !isNaN(v));
+        if (gradRates.length) setGradRateCutoffs(computeCutoffs(gradRates));
+        if (costIndices.length) setCostIndexCutoffs(computeCutoffs(costIndices));
       } catch (err) {
         console.error('Failed to fetch cities:', err.message);
       } finally {
@@ -33,7 +53,6 @@ function explore() {
     fetchCities();
   }, []);
 
-  // Filter cities based on search (and later: population, climate)
   const getFilteredCities = () => {
     let result = cities;
 
@@ -41,9 +60,53 @@ function explore() {
       result = result.filter(city =>
         city.title.toLowerCase().startsWith(searchTerm.toLowerCase()) || city.state.toLowerCase().startsWith(searchTerm.toLowerCase()) || city.abbrev.toLowerCase() === searchTerm.toLowerCase());
     }
-    // Future filters go here:
-    // if (population !== 'all') { result = result.filter(...) }
-    // if (climate !== 'all') { result = result.filter(...) }
+
+    if (population) {
+      result = result.filter(city => {
+        const pop = parseInt(String(city.population).replace(/,/g, ''), 10);
+        if (isNaN(pop)) return false;
+        if (population === 'smallTowns') return pop < 50000;
+        if (population === 'midSize') return pop >= 50000 && pop < 250000;
+        if (population === 'largeCities') return pop >= 250000 && pop < 1000000;
+        if (population === 'majorMetros') return pop >= 1000000;
+        return true;
+      });
+    }
+
+    if (climate) {
+      const climateMap = { warm: 'Warm', mild: 'Mild', snowy: 'Snowy', fourSeasons: 'Four Seasons' };
+      result = result.filter(city => city.weather === climateMap[climate]);
+    }
+
+    if (qolRange[0] > 0 || qolRange[1] < 100) {
+      result = result.filter(city => {
+        const qol = parseInt(String(city.qol).split('/')[0], 10);
+        if (isNaN(qol)) return false;
+        return qol >= qolRange[0] && qol <= qolRange[1];
+      });
+    }
+
+    if (education && gradRateCutoffs) {
+      result = result.filter(city => {
+        const rate = parseInt(String(city.hs_grad_rate).replace('%', ''), 10);
+        if (isNaN(rate)) return false;
+        if (education === 'high') return rate > gradRateCutoffs.high;
+        if (education === 'avg') return rate >= gradRateCutoffs.low && rate <= gradRateCutoffs.high;
+        if (education === 'low') return rate < gradRateCutoffs.low;
+        return true;
+      });
+    }
+
+    if (costIndex && costIndexCutoffs) {
+      result = result.filter(city => {
+        const idx = parseInt(String(city.cost_index), 10);
+        if (isNaN(idx)) return false;
+        if (costIndex === 'high') return idx > costIndexCutoffs.high;
+        if (costIndex === 'avg') return idx >= costIndexCutoffs.low && idx <= costIndexCutoffs.high;
+        if (costIndex === 'low') return idx < costIndexCutoffs.low;
+        return true;
+      });
+    }
 
     return result;
   };
@@ -64,7 +127,7 @@ function explore() {
 
   const noItems = 20;
   const [page, setPage] = useState(1);
-  const handleChange = (value) => {
+  const handleChange = (event, value) => {
     setPage(value);
   }
   const totalPages = Math.ceil(sortedCities.length / noItems);
@@ -74,7 +137,7 @@ function explore() {
 
   useEffect(() => {
     setPage(1)
-  }, [searchTerm, sortOrder])
+  }, [searchTerm, sortOrder, population, climate, qolRange, education, costIndex])
 
   const [alertMsg, setAlertMsg] = useState(null);
   const [compareList, setCompareList] = useState([]);
@@ -116,7 +179,16 @@ function explore() {
       >
         <Grid container spacing={1}>
           <Grid size={{ xs: 12, md: 3}}>
-            <Sidebar sortOrder={sortOrder} setSortOrder={setSortOrder} />
+            <Sidebar
+              sortOrder={sortOrder} setSortOrder={setSortOrder}
+              population={population} setPopulation={setPopulation}
+              climate={climate} setClimate={setClimate}
+              qolRange={qolRange} setQolRange={setQolRange}
+              education={education} setEducation={setEducation}
+              costIndex={costIndex} setCostIndex={setCostIndex}
+              gradRateCutoffs={gradRateCutoffs}
+              costIndexCutoffs={costIndexCutoffs}
+            />
           </Grid>
           <Grid size={{ xs: 12, md: 9 }}>
             <Grid container spacing={3}
