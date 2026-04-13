@@ -123,6 +123,7 @@ function carousel() {
           </IconButton>
           <Swiper
             modules={[Pagination, Navigation]}
+            loop
             grabCursor
             initialSlide={0}
             centeredSlides
