@@ -1,5 +1,5 @@
-import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCities";
-import { Box, Button, Typography, IconButton, useTheme, Snackbar, Alert, Grid } from "@mui/material";
+import { getCityBySlug, getCityImageUrl } from "../../services/myCities";
+import { Box, Button, Typography, IconButton, useTheme, Snackbar, Alert, Grid, CircularProgress } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -9,7 +9,6 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 // import { IoIosGitCompare } from "react-icons/io";
 // import { IoMdGitCompare } from "react-icons/io";
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 function SingleCityPage() {
     const { citySlug } = useParams();
@@ -31,7 +30,11 @@ function SingleCityPage() {
     }, [citySlug]);
 
     if (!city) {
-      return <Typography variant="h2">Loading...</Typography>;
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', pt: 10 }}>
+          <CircularProgress color="primary" aria-label="loading" />
+        </Box>
+      );
     }
 
     const showAlert = (msg) => {

@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, CircularProgress } from "@mui/material";
 import CompareCard from "./comparisionCityCard.jsx";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -15,6 +15,7 @@ function compareCities() {
 
     const [cities, setCities] = useState([]);
     const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchCities() {
@@ -24,6 +25,8 @@ function compareCities() {
             } catch (err) {
                 console.error('Failed to fetch cities:', err.message);
                 setError(true);
+            } finally {
+                setLoading(false);
             }
         }
         fetchCities();
@@ -36,7 +39,11 @@ function compareCities() {
     const handleChange2 = (e) => navigate(`/compare/${slug1}/${e.target.value}`);
 
     if (error) return <Typography variant="h2">Failed to load cities</Typography>;
-    if (cities.length === 0) return null;
+    if (loading) return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', pt: 10 }}>
+            <CircularProgress color="primary" aria-label="loading" />
+        </Box>
+    );
 
     if (!city1 || !city2) {
         return <Typography variant="h2">City not found</Typography>

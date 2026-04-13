@@ -4,7 +4,7 @@ import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCiti
 import { getComments, postComment, deleteComment } from "../../services/comments.js";
 import { getProfilePicUrl } from "../../services/profiles.js";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { Box, Typography, Button, useTheme, Snackbar, Alert } from "@mui/material";
+import { Box, Typography, Button, useTheme, Snackbar, Alert, CircularProgress } from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -67,7 +67,11 @@ function community() {
   }
 
   if (!city) {
-    return <h2>Loading...</h2>;
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', pt: 10 }}>
+        <CircularProgress color="primary" aria-label="loading" />
+      </Box>
+    );
   }
 
   const handleChange = (e) => {

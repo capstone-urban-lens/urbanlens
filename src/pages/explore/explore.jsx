@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Grid, Snackbar, Alert } from '@mui/material';
+import { Box, Grid, Snackbar, Alert, CircularProgress } from '@mui/material';
 import Cards from "../../components/cityCard";
 import Sidebar from "../../components/sidebar";
 import Pagination from '@mui/material/Pagination';
@@ -17,6 +17,7 @@ function explore() {
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get('search') || '';
   const [cities, setCities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCities() {
@@ -25,6 +26,8 @@ function explore() {
         setCities(data);
       } catch (err) {
         console.error('Failed to fetch cities:', err.message);
+      } finally {
+        setLoading(false);
       }
     }
     fetchCities();
@@ -61,7 +64,7 @@ function explore() {
 
   const noItems = 20;
   const [page, setPage] = useState(1);
-  const handleChange = (e, value) => {
+  const handleChange = (value) => {
     setPage(value);
   }
   const totalPages = Math.ceil(sortedCities.length / noItems);
@@ -121,7 +124,13 @@ function explore() {
               pt: 3,
             }}
             >
-              {sortedCities.length === 0 ? (
+              {loading ? (
+                  <Grid size={12}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+                      <CircularProgress color="primary" aria-label="loading" />
+                    </Box>
+                  </Grid>
+                ) : sortedCities.length === 0 ? (
                   <Grid size={12}>
                     <Box sx={{ textAlign: 'center', py: 5, color: '#545454', fontFamily: '"Pontano Sans", sans-serif', fontSize: '1.5rem' }}>
                       No matching cities have been found

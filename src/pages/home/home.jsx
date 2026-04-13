@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography";
-import { Box, Stack, Button, useMediaQuery, Grid, Alert, Snackbar } from "@mui/material";
+import { Box, Stack, Button, useMediaQuery, Grid, Alert, Snackbar, CircularProgress } from "@mui/material";
 import heroImg from "../../assets/img/homeHero.jpg";
 import heroLogo from "../../assets/img/keyNoText.png";
 import { useTheme, alpha } from "@mui/material/styles";
@@ -17,6 +17,7 @@ function home() {
   const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
 
   const [myCities, setMyCities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchFeaturedCities() {
@@ -28,6 +29,8 @@ function home() {
         setMyCities(results.filter(r => r.status === 'fulfilled').map(r => r.value));
       } catch (err) {
         console.error('Failed to fetch featured cities:', err.message);
+      } finally {
+        setLoading(false);
       }
     }
     fetchFeaturedCities();
@@ -439,7 +442,13 @@ function home() {
             // pb: 5,
           }}
           >
-            {myCities.map((city) => (
+            {loading ? (
+              <Grid size={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                  <CircularProgress color="primary" aria-label="loading" />
+                </Box>
+              </Grid>
+            ) : myCities.map((city) => (
               <Grid size={{ xs: 12, md: 6 }} key={city.id}>
                 <CityCard
                   title={city.title}
