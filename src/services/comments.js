@@ -17,11 +17,23 @@ export async function getUserComments(userId) {
     return data;
 }
 
-export async function postComment(cityId, userId, msg) {
+export async function postComment(cityId, userId, msg, parentId = null) {
+    const payload = { city_id: cityId, user_id: userId, msg };
+    if (parentId) payload.parent_id = parentId;
     const {data, error } = await supabase.from('comments')
-    .insert({city_id: cityId, user_id: userId, msg: msg})
+    .insert(payload)
     .select('*, profiles(fname, lname, profile_pic)')
     .single()
+    if (error) throw error;
+    return data;
+}
+
+export async function updateComment(commentId, msg) {
+    const { data, error } = await supabase.from('comments')
+    .update({ msg })
+    .eq('comment_id', commentId)
+    .select('*, profiles(fname, lname, profile_pic)')
+    .single();
     if (error) throw error;
     return data;
 }

@@ -1,10 +1,10 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCities";
-import { getComments, postComment, deleteComment } from "../../services/comments.js";
+import { getComments, postComment, updateComment, deleteComment } from "../../services/comments.js";
 import { getProfilePicUrl } from "../../services/profiles.js";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { Box, Typography, Button, useTheme, Snackbar, Alert, CircularProgress } from "@mui/material";
+import { Box, Typography, Button, useTheme, Snackbar, Alert, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -21,6 +21,7 @@ function community() {
   const { user } = useAuth();
 
   const [alertMsg, setAlertMsg] = useState(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const { citySlug } = useParams();
@@ -50,15 +51,41 @@ function community() {
     setOption(citySlug);
   }, [citySlug]);
 
-  async function handleDeleteComment(commentId) {
-    await deleteComment(commentId);
-    setComments(comments.filter(c => c.comment_id !== commentId));
+  async function confirmDeleteComment() {
+    await deleteComment(pendingDeleteId);
+    setComments(prev => prev.filter(c => c.comment_id !== pendingDeleteId && c.parent_id !== pendingDeleteId));
+    setPendingDeleteId(null);
+  }
+
+  async function handleEditComment(commentId, newMsg) {
+    const original = comments.find(c => c.comment_id === commentId);
+    setComments(prev => prev.map(c => c.comment_id === commentId ? { ...c, msg: newMsg } : c));
+    try {
+      const updated = await updateComment(commentId, newMsg);
+      setComments(prev => prev.map(c => c.comment_id === commentId ? updated : c));
+    } catch (err) {
+      setComments(prev => prev.map(c => c.comment_id === commentId ? original : c));
+      setAlertMsg('Failed to save edit');
+    }
+  }
+
+  async function handleReplyComment(parentId, msg) {
+    if (!user) {
+      setAlertMsg('Please log in to reply');
+      return;
+    }
+    const reply = await postComment(city.city_id, user.id, msg, parentId);
+    setComments(prev => [...prev, reply]);
   }
 
   async function handlePostComment(e) {
     e.preventDefault();
     if (!user) {
       setAlertMsg('Please log in to post a comment');
+      return;
+    }
+    if (!newComment.trim()) {
+      setAlertMsg('Empty comments cannot be posted');
       return;
     }
     const comment = await postComment(city.city_id, user.id, newComment);
@@ -208,15 +235,43 @@ function community() {
                   </Button>
                 </form>
               </Box>
-              {comments.map((comment) => (
-                <CommunityMsg key={comment.comment_id}
-                name={`${comment.profiles.fname} ${comment.profiles.lname}`}
-                image={getProfilePicUrl(comment.profiles.profile_pic)}
-                date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
-                message={comment.msg}
-                isOwner={user && comment.user_id === user.id}
-                onDelete={() => handleDeleteComment(comment.comment_id)}
-                />
+              {comments.filter(c => !c.parent_id).map((comment) => (
+                <Box key={comment.comment_id} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <CommunityMsg
+                    name={`${comment.profiles.fname} ${comment.profiles.lname}`}
+                    image={getProfilePicUrl(comment.profiles.profile_pic)}
+                    date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
+                    message={comment.msg}
+                    isOwner={user && comment.user_id === user.id}
+                    onDelete={() => setPendingDeleteId(comment.comment_id)}
+                    onEdit={(newMsg) => handleEditComment(comment.comment_id, newMsg)}
+                    onReply={user && comment.user_id !== user.id ? (msg) => handleReplyComment(comment.comment_id, msg) : undefined}
+                  />
+                  {comments.filter(r => r.parent_id === comment.comment_id).map((reply) => (
+                    <Box key={reply.comment_id} sx={{
+                      ml: { xs: 4, md: 6 },
+                      pl: 2,
+                      borderLeft: `3px solid ${theme.palette.secondary.main}`,
+                    }}>
+                      <Typography variant="body1" sx={{
+                        color: theme.palette.secondary.main,
+                        fontFamily: 'Pontano Sans',
+                        mb: 0.5,
+                      }}>
+                        ↩ Reply
+                      </Typography>
+                      <CommunityMsg
+                        name={`${reply.profiles.fname} ${reply.profiles.lname}`}
+                        image={getProfilePicUrl(reply.profiles.profile_pic)}
+                        date={new Date(reply.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
+                        message={reply.msg}
+                        isOwner={user && reply.user_id === user.id}
+                        onDelete={() => setPendingDeleteId(reply.comment_id)}
+                        onEdit={(newMsg) => handleEditComment(reply.comment_id, newMsg)}
+                      />
+                    </Box>
+                  ))}
+                </Box>
               ))}
             </Box>
 
@@ -224,6 +279,36 @@ function community() {
         </Box>
         
       </Box>
+      <Dialog
+        open={!!pendingDeleteId}
+        onClose={() => setPendingDeleteId(null)}
+        PaperProps={{
+          sx: {
+            backgroundColor: '#fcfbf6',
+            borderRadius: 2,
+            px: 1,
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontFamily: 'Libre Baskerville', color: theme.palette.primary.main }}>
+          Delete comment?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontFamily: 'Pontano Sans', color: '#646464' }}>
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ pb: 2, pr: 2 }}>
+          <Button onClick={() => setPendingDeleteId(null)} sx={{ color: '#646464' }}>Cancel</Button>
+          <Button
+            onClick={confirmDeleteComment}
+            variant="contained"
+            sx={{ backgroundColor: theme.palette.accent.main, color: theme.palette.text.main }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar
         open={!!alertMsg}
         autoHideDuration={2500}
