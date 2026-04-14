@@ -108,9 +108,13 @@ function community() {
       setAlertMsg('Empty comments cannot be posted');
       return;
     }
-    const comment = await postComment(city.city_id, user.id, newComment);
-    setComments(prev => [comment, ...prev]);
-    setNewComment("");
+    try {
+      const comment = await postComment(city.city_id, user.id, newComment);
+      setComments(prev => [comment, ...prev]);
+      setNewComment("");
+    } catch (err) {
+      setAlertMsg('Failed to post comment');
+    }
   }
 
   if (!city) {

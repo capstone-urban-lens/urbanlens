@@ -161,11 +161,13 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, is
                                 )}
                                 {isOwner && (
                                     <>
-                                        <Tooltip title="Edit">
-                                            <IconButton onClick={() => setIsEditing(true)} sx={{ color: theme.palette.primary.main }}>
-                                                <EditIcon />
-                                            </IconButton>
-                                        </Tooltip>
+                                        {onEdit && (
+                                            <Tooltip title="Edit">
+                                                <IconButton onClick={() => setIsEditing(true)} sx={{ color: theme.palette.primary.main }}>
+                                                    <EditIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
                                         <Tooltip title="Delete">
                                             <IconButton onClick={onDelete} sx={{ color: theme.palette.primary.main }}>
                                                 <DeleteIcon />
