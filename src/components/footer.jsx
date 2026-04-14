@@ -3,26 +3,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import { styled } from "@mui/material/styles";
 import logo from '../assets/img/logo.png';
 
-//figure out links issue 
-
-//then the explore areas and filtering sidebar
-//then single city page 
-//then sign up or compare/contrast
-//community board last i guess 
 
 function Footer () {
     const theme = useTheme();
-    // const FooterLink = styled(RouterLink)(({ theme }) => ({
-    //     display: 'block',
-    //     marginBottom: theme.spacing(1),
-    //     fontSize: '1rem',
-    //     color: theme.palette.background.default,
-    //     textDecoration: 'none',
-    //     cursor: 'pointer',
-    //     '&:hover': {
-    //         opacity: 0.8,
-    //     },
-    // }));
 
     return (
         <>
@@ -34,7 +17,7 @@ function Footer () {
             px: { xs: 3, md: 8 },
             pt: 0,
             pb: { xs: 2, md: 0}, 
-            mt: { xs: 3, lg: 5, },
+            mt: { xs: 6, lg: 12, },
          }}
         >
             <Grid container spacing={2} alignItems="center" textAlign={{xs: 'center', md: 'left'}}>

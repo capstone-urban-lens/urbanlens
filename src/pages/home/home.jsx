@@ -171,7 +171,7 @@ function home() {
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: 5,
+            mt: 12,
             flexDirection: "column",
             alignItems: { xs: "left", lg: "center" },
             ml: { xs: 1, lg: 0 },
@@ -247,6 +247,7 @@ function home() {
         alignItems: 'center',
         p: 4,
         ml: '-10px',
+        mt: 12,
       }}
       >
         <Stack
@@ -258,7 +259,7 @@ function home() {
             width: '100%',
             // justifyContent: { xl: 'space-between'},
             px: { xs: 2, md: 10, xl: 0 },
-            mt: { xs: 2, md: 0 }
+            mt: { xs: 2, md: 0, }
           }}
         >
           <Box sx={{ flex: { xs: '1 1 100%', md: '0 1 600px'}, textAlign: { xs: 'center', md: 'left',
@@ -278,12 +279,13 @@ function home() {
             >
               Join the Community
             </Typography>
-            <Typography variant="body3"
+            <Typography variant="forms"
             sx={{
-              color: theme.palette.background.default
+              color: theme.palette.background.default,
+              mt: 4
             }}
             >
-              Discover what life in your next city is really like. Connect with locals, ask questions, and share your own experiences on our community board. Whether you’re researching your first move or comparing neighborhoods, UrbanLens makes it easy to learn from real people who’ve been there.
+              Discover what life in your next city is <span style={{ color: "#97D071"}}>really</span> like. Connect with locals, ask questions, and share your own experiences on our community board. Whether you’re researching your first move or comparing neighborhoods, UrbanLens makes it easy to learn from real people who’ve been there.
             </Typography>
             <Button color="accent" variant="contained" component={Link} to="/signup"
               sx={{
@@ -296,7 +298,8 @@ function home() {
               Sign Up to Start Connecting
             </Button>
           </Box>
-          <Box sx={{ flex: { xs: '1 1 100%', md: '0 1 600px'}, textAlign: 'center'  }}>
+          <Box sx={
+            { flex: { xs: '1 1 100%', md: '0 1 600px'}, textAlign: 'center',  }}>
             <Box
               component="img"
               src={web}
@@ -309,7 +312,11 @@ function home() {
         </Stack>
       </Box>
 
-      <Box color="Background">
+      <Box color="Background"
+        sx={{
+          my: 12,
+        }}
+      >
         <Grid container spacing={3}
           sx={{
             py: { xs: 1, lg: 5, },
