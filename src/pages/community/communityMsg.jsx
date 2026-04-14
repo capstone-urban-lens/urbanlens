@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Grid, IconButton, TextField, Button } from "@mui/material";
+import { Box, Typography, Grid, IconButton, TextField, Button, Snackbar, Alert } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { LuReply } from "react-icons/lu";
 import theme from "../../theme";
+import defaultPfp from "../../assets/img/default_pfp.jpg";
 
 
 function communityMsg({ name, image, date, message, fullWidth, isOwner=false, onDelete, onEdit, onReply }) {
@@ -14,9 +15,10 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
 
     useEffect(() => {
         if (!isEditing) setEditText(message);
-    }, [message]);
+    }, [message, isEditing]);
     const [isReplying, setIsReplying] = useState(false);
     const [replyText, setReplyText] = useState("");
+    const [showEmptyReplyAlert, setShowEmptyReplyAlert] = useState(false);
 
     function handleEditSubmit() {
         if (editText.trim() && editText.trim() !== message) {
@@ -32,14 +34,17 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
 
     function handleReplySubmit(e) {
         e.preventDefault();
-        if (replyText.trim()) {
-            onReply(replyText.trim());
-            setReplyText("");
-            setIsReplying(false);
+        if (!replyText.trim()) {
+            setShowEmptyReplyAlert(true);
+            return;
         }
+        onReply(replyText.trim());
+        setReplyText("");
+        setIsReplying(false);
     }
 
     return (
+        <>
         <Box
         sx={{
             backgroundColor: 'rgba(144, 170, 85, 0.15)',
@@ -61,7 +66,7 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
                     >
                         <Box
                         component="img"
-                        src={image}
+                        src={image || defaultPfp}
                         alt={name}
                         sx={{
                             mt: 3,
@@ -161,5 +166,16 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
                 </Grid>
             </Grid>
         </Box>
+        <Snackbar
+            open={showEmptyReplyAlert}
+            autoHideDuration={2500}
+            onClose={() => setShowEmptyReplyAlert(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+            <Alert onClose={() => setShowEmptyReplyAlert(false)} severity="error" variant="standard">
+                Empty replies cannot be posted
+            </Alert>
+        </Snackbar>
+        </>
     )
 } export default communityMsg;

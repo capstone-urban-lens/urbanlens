@@ -52,9 +52,14 @@ function community() {
   }, [citySlug]);
 
   async function confirmDeleteComment() {
-    await deleteComment(pendingDeleteId);
-    setComments(prev => prev.filter(c => c.comment_id !== pendingDeleteId && c.parent_id !== pendingDeleteId));
-    setPendingDeleteId(null);
+    try {
+      await deleteComment(pendingDeleteId);
+      setComments(prev => prev.filter(c => c.comment_id !== pendingDeleteId && c.parent_id !== pendingDeleteId));
+    } catch (err) {
+      setAlertMsg('Failed to delete comment');
+    } finally {
+      setPendingDeleteId(null);
+    }
   }
 
   async function handleEditComment(commentId, newMsg) {
@@ -70,12 +75,12 @@ function community() {
   }
 
   async function handleReplyComment(parentId, msg) {
-    if (!user) {
-      setAlertMsg('Please log in to reply');
-      return;
+    try {
+      const reply = await postComment(city.city_id, user.id, msg, parentId);
+      setComments(prev => [...prev, reply]);
+    } catch (err) {
+      setAlertMsg('Failed to post reply');
     }
-    const reply = await postComment(city.city_id, user.id, msg, parentId);
-    setComments(prev => [...prev, reply]);
   }
 
   async function handlePostComment(e) {
@@ -89,7 +94,7 @@ function community() {
       return;
     }
     const comment = await postComment(city.city_id, user.id, newComment);
-    setComments([comment, ...comments]);
+    setComments(prev => [comment, ...prev]);
     setNewComment("");
   }
 
