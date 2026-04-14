@@ -5,12 +5,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { LuReply } from "react-icons/lu";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import theme from "../../theme";
 import defaultPfp from "../../assets/img/default_pfp.jpg";
 
 
 function communityMsg({ name, image, date, message, fullWidth, isOwner=false, isAdmin=false, userId, onDelete, onAdminDelete, onEdit, onReply }) {
+    const location = useLocation();
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(message);
 
@@ -94,6 +95,7 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, is
                                 {...(userId && !isOwner ? {
                                     component: Link,
                                     to: `/profile/${userId}`,
+                                    state: { fromApp: true, from: location.pathname },
                                     style: { textDecoration: 'none' }
                                 } : {})}
                             >

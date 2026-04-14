@@ -1,6 +1,6 @@
 import { Box, Typography, Grid, Avatar, CircularProgress, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import CommunityMsg from "../community/communityMsg.jsx";
@@ -13,12 +13,14 @@ import defaultPfp from "../../assets/img/default_pfp.jpg";
 function PublicProfile() {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
 
   const [profile, setProfile] = useState(null);
   const [comments, setComments] = useState([]);
   const [savedCities, setSavedCities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -29,17 +31,27 @@ function PublicProfile() {
           getCities(),
         ]);
         setProfile(profileData);
-        setComments(commentsData);
+        setComments(commentsData.filter(c => !c.parent_id));
         const bookmarks = profileData.bookmarks ?? [];
-        setSavedCities(allCities.filter(c => bookmarks.includes(c.slug)));
+        const filtered = allCities.filter(c => bookmarks.includes(c.slug));
+        filtered.sort((a, b) => bookmarks.indexOf(a.slug) - bookmarks.indexOf(b.slug));
+        setSavedCities(filtered);
       } catch (err) {
-        console.error('Failed to load profile:', err.message);
+        setFetchError(err.message);
       } finally {
         setLoading(false);
       }
     }
     fetchData();
   }, [userId]);
+
+  const handleBack = () => {
+    if (location.state?.fromApp) {
+      navigate(-1);
+    } else {
+      navigate('/explore');
+    }
+  };
 
   if (loading) {
     return (
@@ -49,10 +61,21 @@ function PublicProfile() {
     );
   }
 
-  if (!profile) {
+  if (fetchError || !profile) {
     return (
-      <Box sx={{ pt: 10, display: 'flex', justifyContent: 'center' }}>
-        <Typography variant="body2" color="text.secondary">User not found.</Typography>
+      <Box sx={{ pt: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          {fetchError ? 'Something went wrong loading this profile.' : 'User not found.'}
+        </Typography>
+        <Button
+          color="accent"
+          variant="contained"
+          onClick={handleBack}
+          sx={{ fontWeight: 600, fontFamily: "'Libre Baskerville'", fontSize: '0.8rem' }}
+        >
+          <ArrowBackIcon sx={{ fontSize: '1.1rem', mr: 0.5 }} />
+          Back
+        </Button>
       </Box>
     );
   }
@@ -67,11 +90,11 @@ function PublicProfile() {
         color="accent"
         variant="contained"
         size="medium"
-        onClick={() => navigate(-1)}
+        onClick={handleBack}
         sx={{ fontWeight: 600, fontFamily: "'Libre Baskerville'", fontSize: '0.8rem', alignSelf: 'flex-start', mb: 2,}}
       >
         <ArrowBackIcon sx={{ fontSize: '1.1rem', mr: 0.5 }} />
-        Back to Community Board
+        Back
       </Button>
 
       {/* Avatar + Name */}
