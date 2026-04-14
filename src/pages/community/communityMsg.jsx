@@ -5,11 +5,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { LuReply } from "react-icons/lu";
+import { Link } from "react-router-dom";
 import theme from "../../theme";
 import defaultPfp from "../../assets/img/default_pfp.jpg";
 
 
-function communityMsg({ name, image, date, message, fullWidth, isOwner=false, isAdmin=false, onDelete, onAdminDelete, onEdit, onReply }) {
+function communityMsg({ name, image, date, message, fullWidth, isOwner=false, isAdmin=false, userId, onDelete, onAdminDelete, onEdit, onReply }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(message);
 
@@ -86,7 +87,16 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, is
                             flex: 1,
                         }}
                         >
-                            <Typography variant="body3" color="primary" sx={{ fontSize: '1.4rem'}}>
+                            <Typography
+                                variant="body3"
+                                color="primary"
+                                sx={{ fontSize: '1.4rem'}}
+                                {...(userId && !isOwner ? {
+                                    component: Link,
+                                    to: `/profile/${userId}`,
+                                    style: { textDecoration: 'none' }
+                                } : {})}
+                            >
                                 {name}
                             </Typography>
                             <Typography variant="body1" sx={{ color: '#646464' }}>

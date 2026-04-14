@@ -262,6 +262,7 @@ function community() {
                     image={getProfilePicUrl(comment.profiles.profile_pic)}
                     date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
                     message={comment.msg}
+                    userId={comment.user_id}
                     isOwner={user && comment.user_id === user.id}
                     isAdmin={isAdmin && user && comment.user_id !== user.id}
                     onDelete={() => { setIsAdminDelete(false); setPendingDeleteId(comment.comment_id); }}
@@ -288,6 +289,7 @@ function community() {
                         image={getProfilePicUrl(reply.profiles.profile_pic)}
                         date={new Date(reply.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
                         message={reply.msg}
+                        userId={reply.user_id}
                         isOwner={user && reply.user_id === user.id}
                         isAdmin={isAdmin && user && reply.user_id !== user.id}
                         onDelete={() => { setIsAdminDelete(false); setPendingDeleteId(reply.comment_id); }}

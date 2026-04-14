@@ -11,6 +11,7 @@ import Signup from "./pages/login/signup";
 import RandomRedirect from "./components/randomCommunityBoard";
 import SingleCityPage from "./pages/explore/singleCityPage.jsx";
 import UserAccount from "./pages/account/userAccount.jsx";
+import PublicProfile from "./pages/account/publicProfile.jsx";
 import Compare from "./pages/compare/compareCities.jsx";
 import RandomCompareRedirect from "./components/randomCompareRedirect.jsx";
 import { useAuth } from "./context/AuthContext";
@@ -66,6 +67,10 @@ function App() {
             <Route
             exact path="/compare/:slug1/:slug2"
             element={<Compare />} />
+
+            <Route
+            exact path="/profile/:userId"
+            element={<PublicProfile />} />
 
           </Routes>
         </main>
