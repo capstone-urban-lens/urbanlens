@@ -9,7 +9,7 @@ import theme from "../../theme";
 import defaultPfp from "../../assets/img/default_pfp.jpg";
 
 
-function communityMsg({ name, image, date, message, fullWidth, isOwner=false, onDelete, onEdit, onReply }) {
+function communityMsg({ name, image, date, message, fullWidth, isOwner=false, isAdmin=false, onDelete, onAdminDelete, onEdit, onReply }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(message);
 
@@ -118,15 +118,16 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
                                             variant="contained"
                                             size="small"
                                             startIcon={<CheckIcon />}
-                                            sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.accent.main }}
+                                            // sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.accent.main }}
                                         >
                                             Save
                                         </Button>
                                         <Button
                                             onClick={handleEditCancel}
+                                            variant="outlined"
                                             size="small"
                                             startIcon={<CloseIcon />}
-                                            sx={{ color: '#646464' }}
+                                            // sx={{ color: '#646464' }}
                                         >
                                             Cancel
                                         </Button>
@@ -140,9 +141,11 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
 
                             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                 {!isOwner && onReply && (
-                                    <IconButton onClick={() => setIsReplying(r => !r)} sx={{ color: theme.palette.primary.main }}>
-                                        <LuReply />
-                                    </IconButton>
+                                    <Tooltip title="Reply">
+                                        <IconButton onClick={() => setIsReplying(r => !r)} sx={{ color: theme.palette.primary.main }}>
+                                            <LuReply />
+                                        </IconButton>
+                                    </Tooltip>
                                 )}
                                 {isOwner && (
                                     <>
@@ -158,6 +161,13 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
                                         </Tooltip>
                                     </>
                                 )}
+                                {isAdmin && (
+                                    <Tooltip title="Remove message">
+                                        <IconButton onClick={onAdminDelete} sx={{ color: '#c62828' }}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                )}
                             </Box>
 
                             {isReplying && (
@@ -170,16 +180,27 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
                                         placeholder="Write a reply..."
                                         multiline
                                         size="small"
-                                        sx={{ width: {xs: '65vw', md: '30vw'} }}
+                                        sx={{
+                                            width: {xs: '65vw', md: '30vw'},
+                                            '& .MuiOutlinedInput-root': {
+                                                fontFamily: 'Pontano Sans',
+                                                fontSize: '1rem',
+                                                backgroundColor: 'rgba(255,255,255,0.6)',
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: theme.palette.primary.main,
+                                                },
+                                            },
+                                        }}
                                     />
                                     <Box sx={{ display: 'flex', gap: 1 }}>
                                         <Button type="submit" variant="contained" size="small"
-                                            sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.accent.main }}
+                                            // sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.accent.main }}
                                         >
                                             Reply
                                         </Button>
-                                        <Button size="small" onClick={() => { setIsReplying(false); setReplyText(""); }}
-                                            sx={{ color: '#646464' }}
+                                        <Button size="small"
+                                        variant="outlined" onClick={() => { setIsReplying(false); setReplyText(""); }}
+                                            // sx={{ color: '#646464' }}
                                         >
                                             Cancel
                                         </Button>

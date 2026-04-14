@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCities, getCityBySlug, getCityImageUrl } from "../../services/myCities";
 import { getComments, postComment, updateComment, deleteComment } from "../../services/comments.js";
-import { getProfilePicUrl } from "../../services/profiles.js";
+import { getProfilePicUrl, getProfile } from "../../services/profiles.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { Box, Typography, Button, useTheme, Snackbar, Alert, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
@@ -21,7 +21,9 @@ function community() {
   const { user } = useAuth();
 
   const [alertMsg, setAlertMsg] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [isAdminDelete, setIsAdminDelete] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const { citySlug } = useParams();
@@ -31,6 +33,19 @@ function community() {
   const [cities, setCities] = useState([]);
   const [city, setCity] = useState(null);
   const [option, setOption] = useState(citySlug);
+
+  useEffect(() => {
+    async function fetchAdminStatus() {
+      if (!user) { setIsAdmin(false); return; }
+      try {
+        const profile = await getProfile(user.id);
+        setIsAdmin(!!profile.is_admin);
+      } catch (err) {
+        setIsAdmin(false);
+      }
+    }
+    fetchAdminStatus();
+  }, [user]);
 
   useEffect(() => {
     async function fetchData() {
@@ -248,14 +263,16 @@ function community() {
                     date={new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
                     message={comment.msg}
                     isOwner={user && comment.user_id === user.id}
-                    onDelete={() => setPendingDeleteId(comment.comment_id)}
+                    isAdmin={isAdmin && user && comment.user_id !== user.id}
+                    onDelete={() => { setIsAdminDelete(false); setPendingDeleteId(comment.comment_id); }}
+                    onAdminDelete={() => { setIsAdminDelete(true); setPendingDeleteId(comment.comment_id); }}
                     onEdit={(newMsg) => handleEditComment(comment.comment_id, newMsg)}
                     onReply={user && comment.user_id !== user.id ? (msg) => handleReplyComment(comment.comment_id, msg) : undefined}
                   />
                   {comments.filter(r => r.parent_id === comment.comment_id).map((reply) => (
                     <Box key={reply.comment_id} sx={{
-                      ml: { xs: 4, md: 6 },
-                      pl: 2,
+                      ml: { xs: 2, md: 6 },
+                      pl: { xs: 1, md: 2 },
                       borderLeft: `3px solid ${theme.palette.secondary.main}`,
                     }}>
                       <Typography variant="body1" sx={{
@@ -266,12 +283,15 @@ function community() {
                         ↩ Reply
                       </Typography>
                       <CommunityMsg
+                        fullWidth
                         name={`${reply.profiles.fname} ${reply.profiles.lname}`}
                         image={getProfilePicUrl(reply.profiles.profile_pic)}
                         date={new Date(reply.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}
                         message={reply.msg}
                         isOwner={user && reply.user_id === user.id}
-                        onDelete={() => setPendingDeleteId(reply.comment_id)}
+                        isAdmin={isAdmin && user && reply.user_id !== user.id}
+                        onDelete={() => { setIsAdminDelete(false); setPendingDeleteId(reply.comment_id); }}
+                        onAdminDelete={() => { setIsAdminDelete(true); setPendingDeleteId(reply.comment_id); }}
                         onEdit={(newMsg) => handleEditComment(reply.comment_id, newMsg)}
                       />
                     </Box>
@@ -287,20 +307,16 @@ function community() {
       <Dialog
         open={!!pendingDeleteId}
         onClose={() => setPendingDeleteId(null)}
-        PaperProps={{
-          sx: {
-            backgroundColor: '#fcfbf6',
-            borderRadius: 2,
-            px: 1,
-          }
-        }}
+        slotProps={{ paper: { sx: { backgroundColor: '#fcfbf6', borderRadius: 2, px: 1 } } }}
       >
         <DialogTitle sx={{ fontFamily: 'Libre Baskerville', color: theme.palette.primary.main }}>
-          Delete comment?
+          {isAdminDelete ? 'Remove comment?' : 'Delete comment?'}
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: 'Pontano Sans', color: '#646464' }}>
-            This action cannot be undone.
+            {isAdminDelete
+              ? 'This comment will be removed for violating community guidelines. This action cannot be undone.'
+              : 'This action cannot be undone.'}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ pb: 2, pr: 2 }}>
@@ -310,7 +326,7 @@ function community() {
             variant="contained"
             sx={{ backgroundColor: theme.palette.accent.main, color: theme.palette.text.main }}
           >
-            Delete
+            {isAdminDelete ? 'Remove' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>
