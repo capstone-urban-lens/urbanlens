@@ -3,29 +3,30 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-import Cities from "../../components/citiesInfo";
 import CityCard from "../../components/cityCard";
+import { getCities, getCityImageUrl } from "../../services/myCities";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import CommunityMsg from "../community/communityMsg.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useAuth } from "../../context/AuthContext";
+import { useBookmarks } from "../../context/BookmarksContext";
 import { getUserComments, deleteComment } from "../../services/comments.js";
 import { getProfile, updateProfile, uploadAvatar, getProfilePicUrl } from "../../services/profiles";
 import defaultPfp from "../../assets/img/default_pfp.jpg";
 
-//add city to show which city the comment was posted on
-//should i update my posts to show post the user liked?
 
 function UserAccount() {
-  const myCities = Cities.slice(6, 8);
   const theme = useTheme();
   const { user } = useAuth();
+  const { bookmarks } = useBookmarks();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
   const [userComments, setUserComments] = useState([]);
   const [profile, setProfile] = useState(null);
+  const [savedCities, setSavedCities] = useState([]);
+  const [savedLoading, setSavedLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState(null);
 
@@ -52,6 +53,19 @@ function UserAccount() {
       .catch((err) => setProfileError(err.message))
       .finally(() => setProfileLoading(false));
   }, [user]);
+
+  useEffect(() => {
+    setSavedLoading(true);
+    if (bookmarks.length === 0) { setSavedCities([]); setSavedLoading(false); return; }
+    getCities()
+      .then((all) => {
+        const filtered = all.filter((c) => bookmarks.includes(c.slug));
+        filtered.sort((a, b) => bookmarks.indexOf(a.slug) - bookmarks.indexOf(b.slug));
+        setSavedCities(filtered);
+      })
+      .catch((err) => console.error('Failed to load saved cities:', err.message))
+      .finally(() => setSavedLoading(false));
+  }, [bookmarks]);
 
   useEffect(() => {
     if (!user) return;
@@ -124,7 +138,7 @@ function UserAccount() {
         return prev.filter((s) => s !== slug);
       }
       const updated = [...prev, slug];
-      const city = Cities.find((c) => c.slug === slug);
+      const city = savedCities.find((c) => c.slug === slug);
       if (updated.length < 2) {
         setAlertMsg(null);
         setTimeout(() =>
@@ -280,25 +294,41 @@ function UserAccount() {
           </Typography>
           <Grid
             container
-            gap={{ xs: 3, md: 0 }}
+            gap={3}
             sx={{
               px: { md: 0 },
               mt: 2,
+              flexWrap: "nowrap",
+              overflowX: "auto",
+              pb: 2,
+              scrollbarWidth: "thin",
+              scrollbarColor: `${theme.palette.primary.main} transparent`,
             }}
           >
-            {myCities.map((city) => (
+            {savedLoading ? (
+              <Grid size={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress color="primary" size={28} />
+                </Box>
+              </Grid>
+            ) : savedCities.length === 0 ? (
+              <Grid size={12}>
+                <Typography variant="body2" color="text.secondary" sx={{ py: 2, fontStyle: 'italic' }}>
+                  No saved cities yet. Bookmark a city to see it here.
+                </Typography>
+              </Grid>
+            ) : savedCities.map((city) => (
               <Grid
-                size={{ xs: 12, md: 6 }}
                 key={city.id}
-                sx={{ "& > a": { mx: 0 } }}
+                sx={{ flexShrink: 0, width: 300 }}
               >
                 <CityCard
                   title={city.title}
-                  image={city.img}
+                  abbrev={city.abbrev}
+                  image={getCityImageUrl(city.slug, 1)}
                   subtitle={city.subtitle}
                   slug={city.slug}
                   defaultBookmarked={true}
-                  defaultLiked={true}
                   onCompare={handleCompare}
                   isComparing={compareList.includes(city.slug)}
                 />

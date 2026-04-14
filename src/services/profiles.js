@@ -30,6 +30,13 @@ export async function updateProfile(userId, updates) {
   return data;
 }
 
+export async function toggleBookmark(userId, slug, currentBookmarks) {
+  const next = currentBookmarks.includes(slug)
+    ? currentBookmarks.filter((s) => s !== slug)
+    : [...currentBookmarks, slug];
+  return updateProfile(userId, { bookmarks: next });
+}
+
 export async function uploadAvatar(userId, file) {
   const ext = file.name.split('.').pop();
   const filePath = `${userId}.${ext}`;

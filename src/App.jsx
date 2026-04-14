@@ -14,6 +14,7 @@ import UserAccount from "./pages/account/userAccount.jsx";
 import Compare from "./pages/compare/compareCities.jsx";
 import RandomCompareRedirect from "./components/randomCompareRedirect.jsx";
 import { useAuth } from "./context/AuthContext";
+import { BookmarksProvider } from "./context/BookmarksContext";
 
 function App() {
   const { user, loading } = useAuth();
@@ -21,6 +22,7 @@ function App() {
   return (
     <>
       <Router>
+      <BookmarksProvider>
         <Navbar />
         <main className="bodyContent">
           <Routes>
@@ -69,6 +71,7 @@ function App() {
         </main>
 
         <Footer />
+      </BookmarksProvider>
       </Router>
       
     </>

@@ -2,6 +2,8 @@ import { getCityBySlug, getCityImageUrl } from "../../services/myCities";
 import { Box, Button, Typography, IconButton, useTheme, Snackbar, Alert, Grid, CircularProgress } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useBookmarks } from "../../context/BookmarksContext";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
@@ -13,10 +15,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 function SingleCityPage() {
     const { citySlug } = useParams();
+    const { user } = useAuth();
+    const { isBookmarked, toggle } = useBookmarks();
+    const theme = useTheme();
     const [city, setCity] = useState(null);
-    const [bookmarked, setBookmarked] = useState(false);
     const [liked, setLiked] = useState(false);
     const [alertMsg, setAlertMsg] = useState(null);
+    const [alertSeverity, setAlertSeverity] = useState('success');
 
     useEffect(() => {
       async function fetchCity() {
@@ -30,6 +35,26 @@ function SingleCityPage() {
       fetchCity();
     }, [citySlug]);
 
+    const showAlert = (msg, severity = 'success') => {
+        setAlertSeverity(severity);
+        setAlertMsg(null);
+        setTimeout(() => setAlertMsg(msg), 100);
+    };
+
+    const handleBookmark = async () => {
+        if (!user) {
+            showAlert('Sign in to bookmark cities', 'info');
+            return;
+        }
+        const wasBookmarked = isBookmarked(citySlug);
+        try {
+            await toggle(citySlug);
+            showAlert(wasBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks', wasBookmarked ? 'info' : 'success');
+        } catch {
+            showAlert('Failed to update bookmark', 'error');
+        }
+    };
+
     if (!city) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', pt: 10 }}>
@@ -37,13 +62,6 @@ function SingleCityPage() {
         </Box>
       );
     }
-
-    const showAlert = (msg) => {
-        setAlertMsg(null);
-        setTimeout(() => setAlertMsg(msg), 100);
-    };
-
-    const theme = useTheme();
 
     
     return (
@@ -76,8 +94,8 @@ function SingleCityPage() {
                     }}
                     />
                     <Box sx={{ mt: 1 }}>
-                        <IconButton onClick={() => { setBookmarked(!bookmarked); showAlert(bookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'); }} sx={{ color: theme.palette.primary.main }}>
-                            {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+                        <IconButton onClick={handleBookmark} sx={{ color: theme.palette.primary.main }}>
+                            {isBookmarked(citySlug) ? <BookmarkIcon /> : <BookmarkBorderIcon />}
                         </IconButton>
                         <IconButton onClick={() => { setLiked(!liked); showAlert(liked ? 'Removed from favorites' : 'Added to favorites'); }} sx={{ color: theme.palette.primary.main }}>
                             {liked ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
@@ -205,7 +223,7 @@ function SingleCityPage() {
                     onClose={() => setAlertMsg(null)}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
-                    <Alert onClose={() => setAlertMsg(null)} severity="success" variant="standard">
+                    <Alert onClose={() => setAlertMsg(null)} severity={alertSeverity} variant="standard">
                         {alertMsg}
                     </Alert>
                 </Snackbar>

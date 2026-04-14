@@ -17,18 +17,38 @@ import { IoMdGitCompare } from "react-icons/io";
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useBookmarks } from "../../context/BookmarksContext";
+import { useAuth } from "../../context/AuthContext";
 
 
 //and change the useState for a state that will persist for user logged in status and beyond refreshes
 
 function cityCard({ title, abbrev, qol, image, population, climate, price, commute, cost_living, slug,  }) {
 
-    const [bookmarked, setBookmarked] = useState(false);
+    const { isBookmarked, toggle } = useBookmarks();
+    const { user } = useAuth();
     const [alertMsg, setAlertMsg] = useState(null);
+    const [alertSeverity, setAlertSeverity] = useState('success');
 
-    const showAlert = (msg) => {
+    const showAlert = (msg, severity = 'success') => {
+        setAlertSeverity(severity);
         setAlertMsg(null);
         setTimeout(() => setAlertMsg(msg), 100);
+    };
+
+    const handleBookmark = async (e) => {
+        e.preventDefault();
+        if (!user) {
+            showAlert('Sign in to bookmark cities', 'error');
+            return;
+        }
+        const wasBookmarked = isBookmarked(slug);
+        try {
+            await toggle(slug);
+            showAlert(wasBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks', wasBookmarked ? 'info' : 'success');
+        } catch {
+            showAlert('Failed to update bookmark', 'error');
+        }
     };
 
     const theme = useTheme();
@@ -131,8 +151,8 @@ function cityCard({ title, abbrev, qol, image, population, climate, price, commu
             pt: 0,
           }}
         >
-          <IconButton onClick={(e) => { e.preventDefault(); setBookmarked(!bookmarked); showAlert(bookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'); }} sx={{ color: theme.palette.accent.main }}>
-            {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+          <IconButton onClick={handleBookmark} sx={{ color: theme.palette.accent.main }}>
+            {isBookmarked(slug) ? <BookmarkIcon /> : <BookmarkBorderIcon />}
           </IconButton>
           
           <IconButton
@@ -155,7 +175,7 @@ function cityCard({ title, abbrev, qol, image, population, climate, price, commu
         onClose={() => setAlertMsg(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
-        <Alert onClose={() => setAlertMsg(null)} severity="success" variant="standard">
+        <Alert onClose={() => setAlertMsg(null)} severity={alertSeverity} variant="standard">
             {alertMsg}
         </Alert>
     </Snackbar>
