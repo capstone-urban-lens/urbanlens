@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Grid, IconButton, TextField, Button, Snackbar, Alert } from "@mui/material";
+import { Box, Typography, Grid, IconButton, TextField, Button, Snackbar, Alert, Tooltip } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
@@ -94,21 +94,42 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
                             </Typography>
 
                             {isEditing ? (
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1, mb: 1 }}>
                                     <TextField
                                         value={editText}
                                         onChange={(e) => setEditText(e.target.value)}
                                         multiline
                                         size="small"
-                                        sx={{ width: {xs: '65vw', md: '30vw'} }}
+                                        sx={{
+                                            width: {xs: '65vw', md: '30vw'},
+                                            '& .MuiOutlinedInput-root': {
+                                                fontFamily: 'Pontano Sans',
+                                                fontSize: '1rem',
+                                                backgroundColor: 'rgba(255,255,255,0.6)',
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: theme.palette.primary.main,
+                                                },
+                                            },
+                                        }}
                                     />
                                     <Box sx={{ display: 'flex', gap: 1 }}>
-                                        <IconButton onClick={handleEditSubmit} sx={{ color: theme.palette.primary.main }}>
-                                            <CheckIcon />
-                                        </IconButton>
-                                        <IconButton onClick={handleEditCancel} sx={{ color: '#646464' }}>
-                                            <CloseIcon />
-                                        </IconButton>
+                                        <Button
+                                            onClick={handleEditSubmit}
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={<CheckIcon />}
+                                            sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.accent.main }}
+                                        >
+                                            Save
+                                        </Button>
+                                        <Button
+                                            onClick={handleEditCancel}
+                                            size="small"
+                                            startIcon={<CloseIcon />}
+                                            sx={{ color: '#646464' }}
+                                        >
+                                            Cancel
+                                        </Button>
                                     </Box>
                                 </Box>
                             ) : (
@@ -125,12 +146,16 @@ function communityMsg({ name, image, date, message, fullWidth, isOwner=false, on
                                 )}
                                 {isOwner && (
                                     <>
-                                        <IconButton onClick={() => setIsEditing(true)} sx={{ color: theme.palette.primary.main }}>
-                                            <EditIcon />
-                                        </IconButton>
-                                        <IconButton onClick={onDelete} sx={{ color: theme.palette.primary.main }}>
-                                            <DeleteIcon />
-                                        </IconButton>
+                                        <Tooltip title="Edit">
+                                            <IconButton onClick={() => setIsEditing(true)} sx={{ color: theme.palette.primary.main }}>
+                                                <EditIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Delete">
+                                            <IconButton onClick={onDelete} sx={{ color: theme.palette.primary.main }}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                     </>
                                 )}
                             </Box>
