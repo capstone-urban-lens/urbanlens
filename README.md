@@ -52,15 +52,15 @@ Our goals with this project were to:
 
 ---
 
-### 📄 Diagrams
+## 📄 Diagrams
 
-## Server-Side Architecture
+### Server-Side Architecture
 ![Server-Side Architecture](/src/assets/diagrams/server-side-architecture.png)
 
-## Supabase Database Schema
+### Supabase Database Schema
 ![Database Schema](/src/assets/diagrams/database-schema.png)
 
-## API Diagram
+### API Diagram
 ![API Diagram](/src/assets/diagrams/api.png)
 
 
