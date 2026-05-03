@@ -36,6 +36,7 @@ Our goals with this project were to:
 
 - **Vercel** – frontend hosting and deployment
 - **GitHub** – version control and collaboration
+- **Docker** - local hosting and consistent dev environment 
 
 ---
 
@@ -50,6 +51,18 @@ Our goals with this project were to:
 - Accessibility-conscious UI (semantic HTML, keyboard navigation, screen reader support)
 
 ---
+
+### 📄 Diagrams
+
+## Server-Side Architecture
+![Server-Side Architecture](/src/assets/diagrams/server-side-architecture.png)
+
+## Supabase Database Schema
+![Database Schema](/src/assets/diagrams/database-schema.png)
+
+## API Diagram
+![API Diagram](/src/assets/diagrams/api.png)
+
 
 ## 👥 Team Contributions
 
