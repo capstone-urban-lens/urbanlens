@@ -27,3 +27,6 @@ accountInfo.txt
 
 # Supabase Connection
 .env
+
+# Local notes
+future-supabase-updates.md
